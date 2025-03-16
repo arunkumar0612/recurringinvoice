@@ -7,10 +7,10 @@ class Site {
   final String serialNo;
   final String siteName;
   final String address;
-  final String customerId;
+  final String siteID;
   final double monthlyCharges;
 
-  Site({required this.siteName, required this.address, required this.customerId, required this.monthlyCharges}) : serialNo = (_counter++).toString(); // Auto-increment serial number
+  Site({required this.siteName, required this.address, required this.siteID, required this.monthlyCharges}) : serialNo = (_counter++).toString(); // Auto-increment serial number
 
   // Convert List of JSON Maps to List of Site objects
   static List<Site> fromJson(List<Map<String, dynamic>> jsonList) {
@@ -20,7 +20,7 @@ class Site {
       return Site(
         siteName: json['sitename'] as String, // Fix key casing
         address: json['address'] as String,
-        customerId: json['customerid'] as String,
+        siteID: json['customerid'] as String,
         monthlyCharges: (json['monthlycharges'] as num).toDouble(),
       );
     }).toList();
@@ -33,7 +33,7 @@ class Site {
 
   // Convert single Site object to JSON
   Map<String, dynamic> toJson() {
-    return {'serialNo': serialNo, 'siteName': siteName, 'address': address, 'customerId': customerId, 'monthlyCharges': monthlyCharges};
+    return {'serialNo': serialNo, 'siteName': siteName, 'address': address, 'siteID': siteID, 'monthlyCharges': monthlyCharges};
   }
 
   dynamic getIndex(int col) {
@@ -41,11 +41,11 @@ class Site {
       case 0:
         return serialNo;
       case 1:
-        return siteName;
+        return siteID;
       case 2:
-        return address;
+        return siteName;
       case 3:
-        return customerId;
+        return address;
       case 4:
         return monthlyCharges;
       default:
@@ -172,7 +172,8 @@ class Invoice {
   final CustomerAccountDetails customerAccountDetails;
   final List<Site> siteData;
   final FinalCalculation finalCalc;
-
+  final List<String> notes;
+  final List<PendingInvoices> pendingInvoices;
   Invoice({
     required this.date,
     required this.invoiceNo,
@@ -183,6 +184,8 @@ class Invoice {
     required this.customerAccountDetails,
     required this.siteData,
     required this.finalCalc,
+    required this.notes,
+    required this.pendingInvoices,
   });
 
   // Convert JSON to Invoice object
@@ -197,6 +200,8 @@ class Invoice {
       customerAccountDetails: CustomerAccountDetails.fromJson(json['customerAccDetails']),
       siteData: Site.fromJson(List<Map<String, dynamic>>.from(json['siteData'])),
       finalCalc: FinalCalculation.fromJson(Site.fromJson(List<Map<String, dynamic>>.from(json['siteData'])), json['gstPercent'] as int, json['pendingAmount'] as double),
+      notes: ['This is a sample note', 'This is another sample note'],
+      pendingInvoices: [],
     );
   }
 
@@ -210,7 +215,52 @@ class Invoice {
       'billPlanDetails': billPlanDetails.toJson(),
       'customerAccDetails': customerAccountDetails.toJson(),
       'siteData': Site.toJsonList(siteData), // Corrected Site List Serialization
+      'finalCalc': finalCalc.toJson(),
+      'addressDetails': addressDetails.toJson(),
+      'notes': notes,
     };
+  }
+}
+
+class PendingInvoices {
+  final String serialNo;
+  final String invoiceid;
+  final String duedate;
+  final String overduedays;
+  final double charges;
+
+  PendingInvoices(this.serialNo, this.invoiceid, this.duedate, this.overduedays, this.charges);
+
+  // Convert JSON (Map) to PendingInvoices object
+  factory PendingInvoices.fromJson(Map<String, dynamic> json) {
+    return PendingInvoices(json['serialNo'] ?? '', json['invoiceid'] ?? '', json['duedate'] ?? '', json['overduedays'] ?? '', (json['charges'] ?? 0.0).toDouble());
+  }
+
+  // Convert PendingInvoices object to JSON (Map)
+  Map<String, dynamic> toJson() {
+    return {'serialNo': serialNo, 'invoiceid': invoiceid, 'duedate': duedate, 'overduedays': overduedays, 'charges': charges};
+  }
+
+  // Convert List<Map<String, dynamic>> to List<PendingInvoices>
+  static List<PendingInvoices> fromJsonList(List<Map<String, dynamic>> jsonList) {
+    return jsonList.map((json) => PendingInvoices.fromJson(json)).toList();
+  }
+
+  dynamic getIndex(int col) {
+    switch (col) {
+      case 0:
+        return serialNo;
+      case 1:
+        return invoiceid;
+      case 2:
+        return duedate;
+      case 3:
+        return overduedays;
+      case 4:
+        return charges;
+      default:
+        return "";
+    }
   }
 }
 

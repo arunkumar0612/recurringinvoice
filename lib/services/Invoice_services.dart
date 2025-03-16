@@ -23,6 +23,14 @@ mixin InvoiceServices {
       billDate: jsonData["billplandetails"]["billdate"],
       dueDate: jsonData["billplandetails"]["duedate"],
     );
+    List<Map<String, dynamic>> jsonList = [
+      {"serialNo": "1", "invoiceid": "8734ADHD", "duedate": "06 Dec 2024", "overduedays": "10 days", "charges": 150},
+      {"serialNo": "2", "invoiceid": "87332DDH", "duedate": "10 Dec 2024", "overduedays": "8 days", "charges": 200},
+      {"serialNo": "3", "invoiceid": "87332DDH", "duedate": "06 Dec 2024", "overduedays": "25 days", "charges": 180},
+      {"serialNo": "4", "invoiceid": "87332DDH", "duedate": "06 Dec 2024", "overduedays": "11 days", "charges": 100},
+      {"serialNo": "5", "invoiceid": "87332DDH", "duedate": "06 Dec 2024", "overduedays": "15 days", "charges": 250},
+    ];
+    List<PendingInvoices> pendingInvoice = PendingInvoices.fromJsonList(jsonList);
 
     // Parse Customer Account Details
     CustomerAccountDetails customerAccount = CustomerAccountDetails(
@@ -44,7 +52,6 @@ mixin InvoiceServices {
     int gstPercent = jsonData["gstPercent"];
     double? pendingAmount = jsonData["pendingAmount"] != null ? (jsonData["pendingAmount"] as num).toDouble() : null;
     FinalCalculation finalCalc = FinalCalculation.fromJson(sites, gstPercent, pendingAmount);
-
     return Invoice(
       date: jsonData["date"],
       invoiceNo: jsonData["invoiceNo"],
@@ -55,6 +62,8 @@ mixin InvoiceServices {
       customerAccountDetails: customerAccount,
       siteData: sites,
       finalCalc: finalCalc,
+      notes: ['This is a system generated invoice hence do not require signature.', 'Please make the payment on or before the due date.'],
+      pendingInvoices: pendingInvoice,
     );
   }
 }
