@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:recurring_invoice/services/APIservices/invoker.dart';
 import 'package:recurring_invoice/services/Invoice_services.dart';
 import 'package:recurring_invoice/services/webSocket_services.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  Get.lazyPut<Invoker>(() => Invoker());
+
   // runApp(MyApp());
   WebsocketServices.startWebSocketServer();
   // Start WebSocket separately
@@ -18,7 +22,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class InvoiceScreen extends StatefulWidget with InvoiceServices {
+class InvoiceScreen extends StatefulWidget {
   const InvoiceScreen({super.key});
 
   @override

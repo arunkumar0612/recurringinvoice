@@ -1,7 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:get/get.dart';
 import 'package:recurring_invoice/models/entities/Invoice_entities.dart';
+import 'package:recurring_invoice/services/APIservices/invoker.dart';
 
-mixin InvoiceServices {
+class InvoiceServices {
+  static final Invoker apiController = Get.find<Invoker>();
   static Invoice parseInvoice(String jsonString) {
     final Map<String, dynamic> jsonData = json.decode(jsonString);
 
@@ -23,6 +27,8 @@ mixin InvoiceServices {
       billDate: jsonData["billplandetails"]["billdate"],
       dueDate: jsonData["billplandetails"]["duedate"],
     );
+
+    ContactDetails contactDetails = ContactDetails(email: jsonData["contactdetails"]["emailid"], phone: jsonData["contactdetails"]["phoneno"]);
     List<Map<String, dynamic>> jsonList = [
       {"serialNo": "1", "invoiceid": "8734ADHD", "duedate": "06 Dec 2024", "overduedays": "10 days", "charges": 150},
       {"serialNo": "2", "invoiceid": "87332DDH", "duedate": "10 Dec 2024", "overduedays": "8 days", "charges": 200},
@@ -59,11 +65,42 @@ mixin InvoiceServices {
       pendingAmount: pendingAmount,
       addressDetails: address,
       billPlanDetails: billPlan,
+      contactDetails: contactDetails,
       customerAccountDetails: customerAccount,
       siteData: sites,
       finalCalc: finalCalc,
       notes: ['This is a system generated invoice hence do not require signature.', 'Please make the payment on or before the due date.'],
       pendingInvoices: pendingInvoice,
     );
+  }
+
+  static dynamic apicall(InvoiceResult Invoices) async {
+    try {
+      PostData salesData = PostData.fromJson(Invoices.invoice);
+
+      await send_data(jsonEncode(salesData.toJson()), Invoices);
+    } catch (e) {
+      // await Basic_dialog(context: context, title: "POST", content: "$e", onOk: () {}, showCancel: false);
+    }
+  }
+
+  static dynamic send_data(String jsonData, InvoiceResult Invoices) async {
+    try {
+      Map<String, dynamic>? response = await apiController.Multer(jsonData, Invoices.files, "http://192.168.0.200:8081/subscription/addrecurringinvoice");
+      if (response['statusCode'] == 200) {
+        // CMDmResponse value = CMDmResponse.fromJson(response);
+        // if (value.code) {
+        //   await Basic_dialog(context: context, title: "Invoice", content: value.message!, onOk: () {}, showCancel: false);
+        //   // Navigator.of(context).pop(true);
+        //   // invoiceController.resetData();
+        // } else {
+        //   await Basic_dialog(context: context, title: 'Processing Invoice', content: value.message ?? "", onOk: () {}, showCancel: false);
+        // }
+      } else {
+        // Basic_dialog(context: context, title: "SERVER DOWN", content: "Please contact administration!", showCancel: false);
+      }
+    } catch (e) {
+      // Basic_dialog(context: context, title: "ERROR", content: "$e", showCancel: false);
+    }
   }
 }

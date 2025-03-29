@@ -1,5 +1,7 @@
 // ignore_for_file: file_names
 
+import 'dart:io';
+
 import 'package:recurring_invoice/utils/helpers/support_functions.dart';
 
 class Site {
@@ -75,6 +77,23 @@ class Address {
   // Convert Address object to JSON
   Map<String, dynamic> toJson() {
     return {'clientName': clientName, 'clientAddress': clientAddress, 'billingName': billingName, 'billingAddress': billingAddress};
+  }
+}
+
+class ContactDetails {
+  final String email;
+  final String phone;
+
+  ContactDetails({required this.email, required this.phone});
+
+  // Convert JSON to Address object
+  factory ContactDetails.fromJson(Map<String, dynamic> json) {
+    return ContactDetails(email: json['emailid'] as String, phone: json['phoneno'] as String);
+  }
+
+  // Convert Address object to JSON
+  Map<String, dynamic> toJson() {
+    return {'email': email, 'phone': phone};
   }
 }
 
@@ -170,6 +189,7 @@ class Invoice {
   final Address addressDetails;
   final BillPlanDetails billPlanDetails;
   final CustomerAccountDetails customerAccountDetails;
+  final ContactDetails contactDetails;
   final List<Site> siteData;
   final FinalCalculation finalCalc;
   final List<String> notes;
@@ -181,6 +201,7 @@ class Invoice {
     required this.pendingAmount,
     required this.addressDetails,
     required this.billPlanDetails,
+    required this.contactDetails,
     required this.customerAccountDetails,
     required this.siteData,
     required this.finalCalc,
@@ -197,6 +218,7 @@ class Invoice {
       pendingAmount: json['pendingAmount'] as double,
       addressDetails: Address.fromJson(json['addressDetails']),
       billPlanDetails: BillPlanDetails.fromJson(json['billPlanDetails']),
+      contactDetails: ContactDetails.fromJson(json['contactdetails']),
       customerAccountDetails: CustomerAccountDetails.fromJson(json['customerAccDetails']),
       siteData: Site.fromJson(List<Map<String, dynamic>>.from(json['siteData'])),
       finalCalc: FinalCalculation.fromJson(Site.fromJson(List<Map<String, dynamic>>.from(json['siteData'])), json['gstPercent'] as int, json['pendingAmount'] as double),
@@ -204,7 +226,23 @@ class Invoice {
       pendingInvoices: [],
     );
   }
-
+  // PostData(
+  //       siteIds: List<int>.from(json["siteids"] ?? []),
+  //       subscriptionBillId: json["subscriptionbillid"] ?? "",
+  //       clientAddressName: json["clientaddressname"] ?? "",
+  //       clientAddress: json["clientaddress"] ?? "",
+  //       billingAddressName: json["billingaddressname"] ?? "",
+  //       billingAddress: json["billingaddress"] ?? "",
+  //       planName: json["planname"] ?? "",
+  //       emailId: json["emailid"] ?? "",
+  //       ccEmail: json["ccemail"] ?? "",
+  //       phoneNo: json["phoneno"] ?? "",
+  //       totalAmount: json["totalamount"] ?? "",
+  //       invoiceGenId: json["invoicegenid"] ?? "",
+  //       date: json["date"] ?? "",
+  //       messageType: json["messagetype"] ?? 0,
+  //       feedback: json["feedback"] ?? "",
+  //     );
   // Convert Invoice object to JSON
   Map<String, dynamic> toJson() {
     return {
@@ -213,6 +251,7 @@ class Invoice {
       'pendingAmount': pendingAmount,
       'gstPercent': gstPercent,
       'billPlanDetails': billPlanDetails.toJson(),
+      'contactdetails': contactDetails.toJson(),
       'customerAccDetails': customerAccountDetails.toJson(),
       'siteData': Site.toJsonList(siteData), // Corrected Site List Serialization
       'finalCalc': finalCalc.toJson(),
@@ -223,17 +262,19 @@ class Invoice {
 }
 
 class PendingInvoices {
+  static int _counter = 1;
   final String serialNo;
   final String invoiceid;
   final String duedate;
   final String overduedays;
   final double charges;
 
-  PendingInvoices(this.serialNo, this.invoiceid, this.duedate, this.overduedays, this.charges);
+  PendingInvoices(this.invoiceid, this.duedate, this.overduedays, this.charges) : serialNo = (_counter++).toString();
 
   // Convert JSON (Map) to PendingInvoices object
   factory PendingInvoices.fromJson(Map<String, dynamic> json) {
-    return PendingInvoices(json['serialNo'] ?? '', json['invoiceid'] ?? '', json['duedate'] ?? '', json['overduedays'] ?? '', (json['charges'] ?? 0.0).toDouble());
+    _counter = 1;
+    return PendingInvoices(json['invoiceid'] ?? '', json['duedate'] ?? '', json['overduedays'] ?? '', (json['charges'] ?? 0.0).toDouble());
   }
 
   // Convert PendingInvoices object to JSON (Map)
@@ -308,4 +349,105 @@ class FinalCalculation {
   Map<String, dynamic> toJson() {
     return {'subtotal': subtotal, 'CGST': cgst, 'SGST': sgst, 'roundOff': roundOff, 'difference': differene, 'total': total, 'pendingAmount': pendingAmount, 'grandTotal': grandTotal};
   }
+}
+
+class PostData {
+  List<int> siteIds;
+  String subscriptionBillId;
+  String clientAddressName;
+  String clientAddress;
+  String billingAddressName;
+  String billingAddress;
+  String planName;
+  String emailId;
+  String ccEmail;
+  String phoneNo;
+  String totalAmount;
+  String invoiceGenId;
+  String date;
+  int messageType;
+  String feedback;
+
+  PostData({
+    required this.siteIds,
+    required this.subscriptionBillId,
+    required this.clientAddressName,
+    required this.clientAddress,
+    required this.billingAddressName,
+    required this.billingAddress,
+    required this.planName,
+    required this.emailId,
+    required this.ccEmail,
+    required this.phoneNo,
+    required this.totalAmount,
+    required this.invoiceGenId,
+    required this.date,
+    required this.messageType,
+    required this.feedback,
+  });
+  // Map<String, dynamic> toJson() {
+  //     return {
+  //       'date': date,
+  //       'invoiceNo': invoiceNo,
+  //       'pendingAmount': pendingAmount,
+  //       'gstPercent': gstPercent,
+  //       'billPlanDetails': billPlanDetails.toJson(),
+  //       'customerAccDetails': customerAccountDetails.toJson(),
+  //       'siteData': Site.toJsonList(siteData), // Corrected Site List Serialization
+  //       'finalCalc': finalCalc.toJson(),
+  //       'addressDetails': addressDetails.toJson(),
+  //       'notes': notes,
+  //     };
+  //   }
+  factory PostData.fromJson(Invoice data) {
+    List<int> ids = [];
+    for (var site in data.siteData) {
+      ids.add(int.parse(site.siteID));
+    }
+
+    return PostData(
+      siteIds: ids,
+      subscriptionBillId: data.invoiceNo,
+      clientAddressName: data.addressDetails.clientName,
+      clientAddress: data.addressDetails.clientAddress,
+      billingAddressName: data.addressDetails.billingName,
+      billingAddress: data.addressDetails.billingName,
+      planName: data.billPlanDetails.planName,
+      emailId: data.contactDetails.email,
+      ccEmail: data.contactDetails.email,
+      phoneNo: data.contactDetails.phone,
+      totalAmount: data.finalCalc.grandTotal.toString(),
+      invoiceGenId: data.invoiceNo,
+      date: data.date,
+      messageType: 3,
+      feedback: "",
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "siteids": siteIds,
+      "subscriptionbillid": subscriptionBillId,
+      "clientaddressname": clientAddressName,
+      "clientaddress": clientAddress,
+      "billingaddressname": billingAddressName,
+      "billingaddress": billingAddress,
+      "planname": planName,
+      "emailid": emailId,
+      "ccemail": ccEmail,
+      "phoneno": phoneNo,
+      "totalamount": totalAmount,
+      "invoicegenid": invoiceGenId,
+      "date": date,
+      "messagetype": messageType,
+      "feedback": feedback,
+    };
+  }
+}
+
+class InvoiceResult {
+  final List<File> files;
+  final Invoice invoice;
+
+  InvoiceResult({required this.files, required this.invoice});
 }
