@@ -26,6 +26,7 @@ class InvoiceServices {
       billPeriod: jsonData["billplandetails"]["billperiod"],
       billDate: jsonData["billplandetails"]["billdate"],
       dueDate: jsonData["billplandetails"]["duedate"],
+      subscriptionBillId: jsonData['billplandetails']['subscription_billid'],
     );
 
     ContactDetails contactDetails = ContactDetails(email: jsonData["contactdetails"]["emailid"], phone: jsonData["contactdetails"]["phoneno"]);
@@ -80,6 +81,7 @@ class InvoiceServices {
 
       await send_data(jsonEncode(salesData.toJson()), Invoices);
     } catch (e) {
+      print(e);
       // await Basic_dialog(context: context, title: "POST", content: "$e", onOk: () {}, showCancel: false);
     }
   }
@@ -88,6 +90,7 @@ class InvoiceServices {
     try {
       Map<String, dynamic>? response = await apiController.Multer(jsonData, Invoices.files, "http://192.168.0.200:8081/subscription/addrecurringinvoice");
       if (response['statusCode'] == 200) {
+        print(response['data']);
         // CMDmResponse value = CMDmResponse.fromJson(response);
         // if (value.code) {
         //   await Basic_dialog(context: context, title: "Invoice", content: value.message!, onOk: () {}, showCancel: false);

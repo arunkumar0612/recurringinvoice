@@ -9,7 +9,7 @@ class Site {
   final String serialNo;
   final String siteName;
   final String address;
-  final String siteID;
+  final int siteID;
   final double monthlyCharges;
 
   Site({required this.siteName, required this.address, required this.siteID, required this.monthlyCharges}) : serialNo = (_counter++).toString(); // Auto-increment serial number
@@ -22,7 +22,7 @@ class Site {
       return Site(
         siteName: json['sitename'] as String, // Fix key casing
         address: json['address'] as String,
-        siteID: json['customerid'] as String,
+        siteID: json['siteid'] as int,
         monthlyCharges: (json['monthlycharges'] as num).toDouble(),
       );
     }).toList();
@@ -105,6 +105,7 @@ class BillPlanDetails {
   final String billPeriod;
   final String billDate;
   final String dueDate;
+  final int subscriptionBillId;
 
   BillPlanDetails({
     required this.planName,
@@ -114,6 +115,7 @@ class BillPlanDetails {
     required this.billPeriod,
     required this.billDate,
     required this.dueDate,
+    required this.subscriptionBillId,
   });
 
   // Convert JSON to BillPlanDetails object
@@ -126,6 +128,7 @@ class BillPlanDetails {
       billPeriod: json['billPeriod'] as String,
       billDate: json['billDate'] as String,
       dueDate: json['dueDate'] as String,
+      subscriptionBillId: json['subscription_billid'] as int,
     );
   }
 
@@ -353,7 +356,7 @@ class FinalCalculation {
 
 class PostData {
   List<int> siteIds;
-  String subscriptionBillId;
+  int subscriptionBillId;
   String clientAddressName;
   String clientAddress;
   String billingAddressName;
@@ -402,12 +405,12 @@ class PostData {
   factory PostData.fromJson(Invoice data) {
     List<int> ids = [];
     for (var site in data.siteData) {
-      ids.add(int.parse(site.siteID));
+      ids.add(site.siteID);
     }
 
     return PostData(
       siteIds: ids,
-      subscriptionBillId: data.invoiceNo,
+      subscriptionBillId: data.billPlanDetails.subscriptionBillId,
       clientAddressName: data.addressDetails.clientName,
       clientAddress: data.addressDetails.clientAddress,
       billingAddressName: data.addressDetails.billingName,
