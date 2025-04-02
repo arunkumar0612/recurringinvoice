@@ -41,6 +41,7 @@ class InvoiceServices {
 
     // Parse Customer Account Details
     CustomerAccountDetails customerAccount = CustomerAccountDetails(
+      customerID: jsonData["customeraccountdetails"]["customerid"],
       relationshipId: jsonData["customeraccountdetails"]["relationshipid"],
       billNumber: jsonData["customeraccountdetails"]["billnumber"],
       customerGSTIN: jsonData["customeraccountdetails"]["customergstin"],

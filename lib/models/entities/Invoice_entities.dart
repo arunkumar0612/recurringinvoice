@@ -139,6 +139,7 @@ class BillPlanDetails {
 }
 
 class CustomerAccountDetails {
+  final int customerID;
   final String relationshipId;
   final String billNumber;
   final String customerGSTIN;
@@ -148,6 +149,7 @@ class CustomerAccountDetails {
   final String contactNumber;
 
   CustomerAccountDetails({
+    required this.customerID,
     required this.relationshipId,
     required this.billNumber,
     required this.customerGSTIN,
@@ -160,6 +162,7 @@ class CustomerAccountDetails {
   // Convert JSON to CustomerAccountDetails object
   factory CustomerAccountDetails.fromJson(Map<String, dynamic> json) {
     return CustomerAccountDetails(
+      customerID: json['customerid'] as int,
       relationshipId: json['relationshipId'] as String,
       billNumber: json['billNumber'] as String,
       customerGSTIN: json['customerGSTIN'] as String,
@@ -173,6 +176,7 @@ class CustomerAccountDetails {
   // Convert CustomerAccountDetails object to JSON
   Map<String, dynamic> toJson() {
     return {
+      'customerid': customerID,
       'relationshipId': relationshipId,
       'billNumber': billNumber,
       'customerGSTIN': customerGSTIN,
@@ -357,6 +361,7 @@ class FinalCalculation {
 class PostData {
   List<int> siteIds;
   int subscriptionBillId;
+  int customerID;
   String clientAddressName;
   String clientAddress;
   String billingAddressName;
@@ -374,6 +379,7 @@ class PostData {
   PostData({
     required this.siteIds,
     required this.subscriptionBillId,
+    required this.customerID,
     required this.clientAddressName,
     required this.clientAddress,
     required this.billingAddressName,
@@ -411,6 +417,7 @@ class PostData {
     return PostData(
       siteIds: ids,
       subscriptionBillId: data.billPlanDetails.subscriptionBillId,
+      customerID: data.customerAccountDetails.customerID,
       clientAddressName: data.addressDetails.clientName,
       clientAddress: data.addressDetails.clientAddress,
       billingAddressName: data.addressDetails.billingName,
@@ -431,6 +438,7 @@ class PostData {
     return {
       "siteids": siteIds,
       "subscriptionbillid": subscriptionBillId,
+      "customerid": customerID,
       "clientaddressname": clientAddressName,
       "clientaddress": clientAddress,
       "billingaddressname": billingAddressName,
