@@ -1,7 +1,5 @@
 import 'dart:io';
 
-import 'package:recurring_invoice/utils/helpers/generators.dart';
-
 mixin WebsocketServices {
   static void startWebSocketServer() async {
     final server = await HttpServer.bind(InternetAddress.anyIPv4, 8081);
@@ -14,8 +12,8 @@ mixin WebsocketServices {
 
         socket.listen(
           (message) {
-            Generators.InvoiceGenerator(message);
             print('Received: $message');
+            // Generators.InvoiceGenerator(message);
             socket.add('Echo: $message');
           },
           onDone: () {
