@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:get/get.dart';
 import 'package:recurring_invoice/services/APIservices/api_service.dart';
 import 'package:recurring_invoice/utils/helpers/encrypt_decrypt.dart';
@@ -115,7 +116,7 @@ class Invoker extends GetxController {
     final encryptedData = AES.encryptWithAES(secret, body);
 
     // Prepare form data with multiple files
-    FormData formData = FormData({"STOKEN": secret, "querystring": encryptedData, "file": files.map((file) => MultipartFile(file, filename: file.path.split('/').last)).toList()});
+    FormData formData = FormData({"STOKEN": secret, "querystring": encryptedData, "files": files.map((file) => MultipartFile(file, filename: file.path.split('/').last)).toList()});
 
     // Send request
     final response = await apiService.postMulter(API, formData);

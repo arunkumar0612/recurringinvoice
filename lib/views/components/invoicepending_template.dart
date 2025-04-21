@@ -1,8 +1,8 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:flutter/services.dart';
-import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 import 'package:recurring_invoice/models/entities/Invoice_entities.dart';
 import 'package:recurring_invoice/utils/helpers/support_functions.dart';
 
@@ -17,7 +17,7 @@ class InvoicependingTemplate {
   late pw.MemoryImage profileImage;
 
   // Function to build the PDF
-  Future<Uint8List> buildPdf(PdfPageFormat pageFormat) async {
+  dynamic buildPdf(PdfPageFormat pageFormat, pw.Document doc) async {
     // Load fonts asynchronously
     Helvetica = await loadFont_regular();
     Helvetica_bold = await loadFont_bold();
@@ -27,7 +27,7 @@ class InvoicependingTemplate {
     profileImage = pw.MemoryImage(imageData.buffer.asUint8List());
 
     // Create PDF document
-    final doc = pw.Document();
+    // final doc = pw.Document();
 
     doc.addPage(
       pw.MultiPage(
@@ -57,7 +57,7 @@ class InvoicependingTemplate {
     );
 
     // Return the PDF file as a Uint8List
-    return doc.save();
+    // return doc.save();
   }
 
   pw.Widget header(pw.Context context) {

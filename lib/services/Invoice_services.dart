@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:get/get.dart';
 import 'package:recurring_invoice/models/entities/Invoice_entities.dart';
 import 'package:recurring_invoice/services/APIservices/invoker.dart';
 
 class InvoiceServices {
   static final Invoker apiController = Get.find<Invoker>();
-  static Invoice parseInvoice(String jsonString) {
-    final Map<String, dynamic> jsonData = json.decode(jsonString);
+  static Invoice parseInvoice(Map<String, dynamic> jsonData) {
+    // final Map<String, dynamic> jsonData = json.decode(jsonString);
 
     // Parse Address
     Address address = Address(
@@ -76,20 +77,25 @@ class InvoiceServices {
     );
   }
 
-  static dynamic apicall(InvoiceResult Invoices) async {
+  static dynamic apicall(List<InvoiceResult> Invoices, List<File> GeneratedInvoices) async {
     try {
-      PostData salesData = PostData.fromJson(Invoices.invoice);
+      List<PostData> jsonClub = [];
 
-      await send_data(jsonEncode(salesData.toJson()), Invoices);
+      for (int i = 0; i < Invoices.length; i++) {
+        PostData salesData = PostData.fromJson(Invoices[i].invoice);
+        jsonClub.add(salesData);
+      }
+      print(jsonClub);
+      await send_data(jsonEncode(jsonClub.map((e) => e.toJson()).toList()), GeneratedInvoices);
     } catch (e) {
       print(e);
       // await Basic_dialog(context: context, title: "POST", content: "$e", onOk: () {}, showCancel: false);
     }
   }
 
-  static dynamic send_data(String jsonData, InvoiceResult Invoices) async {
+  static dynamic send_data(String jsonData, List<File> GeneratedInvoices) async {
     try {
-      Map<String, dynamic>? response = await apiController.Multer(jsonData, Invoices.files, "http://192.168.0.200:8081/subscription/addrecurringinvoice");
+      Map<String, dynamic>? response = await apiController.Multer(jsonData, GeneratedInvoices, "http://192.168.0.200:8081/subscription/addrecurringinvoice");
       if (response['statusCode'] == 200) {
         print(response['data']);
         // CMDmResponse value = CMDmResponse.fromJson(response);

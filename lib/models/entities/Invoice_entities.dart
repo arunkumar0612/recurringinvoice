@@ -20,10 +20,10 @@ class Site {
 
     return jsonList.map((json) {
       return Site(
-        siteName: json['sitename'] as String, // Fix key casing
+        siteName: json['site_name'] as String, // Fix key casing
         address: json['address'] as String,
-        siteID: json['siteid'] as int,
-        monthlyCharges: (json['monthlycharges'] as num).toDouble(),
+        siteID: json['site_id'] as int,
+        monthlyCharges: (json['monthly_charges'] as num).toDouble(),
       );
     }).toList();
   }
