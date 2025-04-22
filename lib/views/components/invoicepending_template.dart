@@ -36,9 +36,9 @@ class InvoicependingTemplate {
         footer: (context) => footer(context),
         build:
             (context) => [
-              contentTable(context),
+              pending_contentTable(context),
               pw.SizedBox(height: 10),
-              final_amount(context),
+              pending_final_amount(context),
               pw.SizedBox(height: 40),
               pw.Align(
                 alignment: pw.Alignment.center,
@@ -129,7 +129,7 @@ class InvoicependingTemplate {
     );
   }
 
-  pw.Widget contentTable(pw.Context context) {
+  pw.Widget pending_contentTable(pw.Context context) {
     const tableHeaders = ['S.No', 'Invoice ID', 'Due Date', 'Overdue Days', '               Charges'];
 
     return pw.Table(
@@ -182,7 +182,7 @@ class InvoicependingTemplate {
     return pw.Alignment.centerLeft; // Default left alignment
   }
 
-  pw.Widget final_amount(pw.Context context) {
+  pw.Widget pending_final_amount(pw.Context context) {
     return pw.Align(
       alignment: pw.Alignment.centerRight,
       child: pw.Container(

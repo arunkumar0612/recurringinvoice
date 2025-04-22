@@ -42,6 +42,7 @@ class InvoiceServices {
 
     // Parse Customer Account Details
     CustomerAccountDetails customerAccount = CustomerAccountDetails(
+      consolidate_email: jsonData["customeraccountdetails"]["consolidate_email"],
       customerID: jsonData["customeraccountdetails"]["customerid"],
       relationshipId: jsonData["customeraccountdetails"]["relationshipid"],
       billNumber: jsonData["customeraccountdetails"]["billnumber"],
@@ -85,7 +86,7 @@ class InvoiceServices {
         PostData salesData = PostData.fromJson(Invoices[i].invoice);
         jsonClub.add(salesData);
       }
-      print(jsonClub);
+      print("jsonclub : ${jsonClub.length} GeneratedInvoices : ${GeneratedInvoices.length}");
       await send_data(jsonEncode(jsonClub.map((e) => e.toJson()).toList()), GeneratedInvoices);
     } catch (e) {
       print(e);
@@ -97,7 +98,7 @@ class InvoiceServices {
     try {
       Map<String, dynamic>? response = await apiController.Multer(jsonData, GeneratedInvoices, "http://192.168.0.200:8081/subscription/addrecurringinvoice");
       if (response['statusCode'] == 200) {
-        print(response['data']);
+        // print(response['data']);
         // CMDmResponse value = CMDmResponse.fromJson(response);
         // if (value.code) {
         //   await Basic_dialog(context: context, title: "Invoice", content: value.message!, onOk: () {}, showCancel: false);

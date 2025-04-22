@@ -43,6 +43,23 @@ class InvoiceTemplate {
               contentTable(context),
               pw.SizedBox(height: 10),
               tax_table(context),
+
+              pending_contentTable(context),
+              pw.SizedBox(height: 10),
+              pending_final_amount(context),
+              pw.SizedBox(height: 40),
+              pw.Align(
+                alignment: pw.Alignment.center,
+                child: pw.Text(
+                  '*** This list was created because there are pending invoices. ***',
+                  style: pw.TextStyle(
+                    font: Helvetica,
+                    fontSize: 12.toDouble(),
+                    color: PdfColors.grey500,
+                    // fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+              ),
             ],
       ),
     );
@@ -965,6 +982,74 @@ class InvoiceTemplate {
           ),
         ),
       ],
+    );
+  }
+
+  pw.Widget pending_contentTable(pw.Context context) {
+    const tableHeaders = ['S.No', 'Invoice ID', 'Due Date', 'Overdue Days', '               Charges'];
+
+    return pw.Table(
+      border: null,
+      columnWidths: {
+        0: const pw.FlexColumnWidth(1), // S.No (Small width)
+        1: const pw.FlexColumnWidth(2), // Site Name (Medium width)
+        2: const pw.FlexColumnWidth(3), // Address (Larger width)
+        3: const pw.FlexColumnWidth(4), // Customer ID (Medium width)
+        4: const pw.FlexColumnWidth(2), // Monthly Charges (Medium width)
+      },
+      children: [
+        // Header Row
+        pw.TableRow(
+          decoration: pw.BoxDecoration(borderRadius: const pw.BorderRadius.all(pw.Radius.circular(2)), color: baseColor),
+          children:
+              tableHeaders.map((header) {
+                return pw.Container(
+                  padding: const pw.EdgeInsets.all(5),
+                  alignment: pw.Alignment.centerLeft,
+                  child: pw.Text(header, style: pw.TextStyle(font: Helvetica_bold, color: PdfColors.white, fontSize: 10, fontWeight: pw.FontWeight.bold)),
+                );
+              }).toList(),
+        ),
+        // Data Rows
+        ...List.generate(instInvoice.pendingInvoices.length, (row) {
+          return pw.TableRow(
+            decoration: pw.BoxDecoration(
+              color: row % 2 == 0 ? PdfColors.green50 : PdfColors.white, // Alternate row colors
+            ),
+            children: List.generate(
+              tableHeaders.length,
+              (col) => pw.Container(
+                padding: const pw.EdgeInsets.only(top: 10, bottom: 10, left: 5, right: 5),
+                alignment: _getAlignment(col),
+                child: pw.Text(instInvoice.pendingInvoices[row].getIndex(col).toString(), style: pw.TextStyle(font: Helvetica, color: _darkColor, fontSize: 10)),
+              ),
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  // // Function to set alignment for each column
+  // pw.Alignment _getAlignment(int columnIndex) {
+  //   if (columnIndex == 4) {
+  //     return pw.Alignment.centerRight; // Align Monthly Charges to right
+  //   }
+  //   return pw.Alignment.centerLeft; // Default left alignment
+  // }
+
+  pw.Widget pending_final_amount(pw.Context context) {
+    return pw.Align(
+      alignment: pw.Alignment.centerRight,
+      child: pw.Container(
+        width: 185, // Define width to ensure bounded constraints
+        child: pw.Column(
+          mainAxisAlignment: pw.MainAxisAlignment.start,
+          children: [
+            pw.Padding(padding: pw.EdgeInsets.only(right: 5), child: pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [bold('Total', 12), bold("Rs.${1000}", 12)])),
+          ],
+        ),
+      ),
     );
   }
 }

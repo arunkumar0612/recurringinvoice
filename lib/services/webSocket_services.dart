@@ -27,35 +27,66 @@ class WebsocketServices {
             if (decoded is List) {
               allSites = decoded.map<Map<String, dynamic>>((item) => Map<String, dynamic>.from(item)).toList();
               // print('Ressssssssssssssssssceived: $allSites');
-              Map<String, List<Map<String, dynamic>>> groupedByEmail = {};
-              List<String> emails = [];
+              Map<String, Map<String, List<Map<String, dynamic>>>> groupedbyCompanyid = {};
+              List<String> companyIds = [];
 
-              // Grouping by email
+              // Grouping by company_ID
               for (var site in allSites) {
-                final contactDetails = site['contactdetails'] as Map<String, dynamic>?;
-                final email = contactDetails?['emailid'] ?? 'unknown';
+                final contactDetails = site['customeraccountdetails'] as Map<String, dynamic>?;
+                final companyId = '${contactDetails?['customerid'] ?? 'unknown'}';
 
-                if (!groupedByEmail.containsKey(email)) {
-                  groupedByEmail[email] = [];
-                  emails.add(email);
+                if (!groupedbyCompanyid.containsKey(companyId)) {
+                  groupedbyCompanyid[companyId] = {};
+                  groupedbyCompanyid[companyId]!['individual'] = [];
+                  groupedbyCompanyid[companyId]!['consolidate'] = [];
+                  companyIds.add(companyId);
                 }
-
-                groupedByEmail[email]!.add(site);
+                if (contactDetails!['consolidate_email'] == 'individual') {
+                  groupedbyCompanyid[companyId]!['individual']!.add(site);
+                } else if (contactDetails['consolidate_email'] == 'consolidate') {
+                  groupedbyCompanyid[companyId]!['consolidate']!.add(site);
+                }
               }
 
-              for (int i = 0; i < groupedByEmail.length; i++) {
-                for (int j = 0; j < groupedByEmail[emails[i]]!.length; j++) {
-                  Generators.InvoiceGenerator(groupedByEmail[emails[i]]![j]);
-                  await Future.delayed(const Duration(milliseconds: 2000));
+              print(groupedbyCompanyid.length);
+
+              for (int i = 0; i < groupedbyCompanyid.length; i++) {
+                if (groupedbyCompanyid[companyIds[i]]!['individual']!.isNotEmpty) {
+                  for (int ind = 0; ind < groupedbyCompanyid[companyIds[i]]!['individual']!.length; ind++) {
+                    Generators.InvoiceGenerator(groupedbyCompanyid[companyIds[i]]!['individual']![ind]);
+                    await Future.delayed(const Duration(milliseconds: 2000));
+                    await InvoiceServices.apicall(InvoicesList, mailSenderList);
+                    await Future.delayed(const Duration(milliseconds: 4000));
+                    mailSenderList.clear();
+                    InvoicesList.clear();
+                  }
                 }
-                await InvoiceServices.apicall(InvoicesList, mailSenderList);
-                await Future.delayed(const Duration(milliseconds: 4000));
-                mailSenderList.clear();
-                InvoicesList.clear();
+
+                if (groupedbyCompanyid[companyIds[i]]!['consolidate']!.isNotEmpty) {
+                  for (int cons = 0; cons < groupedbyCompanyid[companyIds[i]]!['consolidate']!.length; cons++) {
+                    Generators.InvoiceGenerator(groupedbyCompanyid[companyIds[i]]!['consolidate']![cons]);
+                    await Future.delayed(const Duration(milliseconds: 2000));
+                  }
+                  await InvoiceServices.apicall(InvoicesList, mailSenderList);
+                  await Future.delayed(const Duration(milliseconds: 8000));
+                  mailSenderList.clear();
+                  InvoicesList.clear();
+                }
               }
+
+              // for (int i = 0; i < groupedbyCompanyid.length; i++) {
+              //   for (int j = 0; j < groupedbyCompanyid[companyIds[i]]!.length; j++) {
+              //     Generators.InvoiceGenerator(groupedbyCompanyid[companyIds[i]]![j]);
+              //     await Future.delayed(const Duration(milliseconds: 2000));
+              //   }
+              //   await InvoiceServices.apicall(InvoicesList, mailSenderList);
+              //   await Future.delayed(const Duration(milliseconds: 4000));
+              //   mailSenderList.clear();
+              //   InvoicesList.clear();
+              // }
               // Generators.InvoiceGenerator(message);
               // Final grouped list of lists
-              // List<List<Map<String, dynamic>>> groupedSiteLists = groupedByEmail.values.toList();
+              // List<List<Map<String, dynamic>>> groupedSiteLists = groupedBy_companyID.values.toList();
 
               // print("*************************************************$groupedSiteLists");
             } else {

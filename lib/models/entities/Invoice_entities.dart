@@ -139,6 +139,7 @@ class BillPlanDetails {
 }
 
 class CustomerAccountDetails {
+  final String consolidate_email;
   final int customerID;
   final String relationshipId;
   final String billNumber;
@@ -149,6 +150,7 @@ class CustomerAccountDetails {
   final String contactNumber;
 
   CustomerAccountDetails({
+    required this.consolidate_email,
     required this.customerID,
     required this.relationshipId,
     required this.billNumber,
@@ -162,6 +164,7 @@ class CustomerAccountDetails {
   // Convert JSON to CustomerAccountDetails object
   factory CustomerAccountDetails.fromJson(Map<String, dynamic> json) {
     return CustomerAccountDetails(
+      consolidate_email: json['consolidate_email'] as String,
       customerID: json['customerid'] as int,
       relationshipId: json['relationshipId'] as String,
       billNumber: json['billNumber'] as String,
@@ -176,6 +179,7 @@ class CustomerAccountDetails {
   // Convert CustomerAccountDetails object to JSON
   Map<String, dynamic> toJson() {
     return {
+      'consolidate_email': consolidate_email,
       'customerid': customerID,
       'relationshipId': relationshipId,
       'billNumber': billNumber,

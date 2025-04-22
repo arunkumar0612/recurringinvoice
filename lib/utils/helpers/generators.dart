@@ -14,7 +14,7 @@ class Generators {
   static Future<InvoiceResult> InvoiceGenerator(Map<String, dynamic> jsonResponse) async {
     // Parse invoice from JSON
     Invoice invoice = InvoiceServices.parseInvoice(jsonResponse);
-    print(invoice.toJson()); // Verify the parsed invoice
+    // print(invoice.toJson()); // Verify the parsed invoice
 
     // Define file paths
     String mainFilepath = 'E:/RecurringInvoices/main_${generateRandomString(6)}.pdf';
@@ -22,10 +22,10 @@ class Generators {
     Uint8List GeneratedInvoice = await InvoiceTemplate(instInvoice: invoice).buildPdf(PdfPageFormat.a4);
     mainFile.writeAsBytes(GeneratedInvoice);
     // String savePath = "$selectedDirectory/$filename.pdf";
-    await mainFile.copy(mainFilepath);
+    // await mainFile.copy(mainFilepath);
     WebsocketServices.mailSenderList.add(mainFile);
     WebsocketServices.InvoicesList.add(InvoiceResult(files: [mainFile], invoice: invoice));
-    print("*************************************************${WebsocketServices.mailSenderList}");
+    // print("*************************************************${WebsocketServices.mailSenderList}");
     InvoiceResult(files: [mainFile], invoice: invoice);
 
     return InvoiceResult(files: [mainFile], invoice: invoice);
