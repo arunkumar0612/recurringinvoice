@@ -285,7 +285,7 @@ class PendingInvoices {
   // Convert JSON (Map) to PendingInvoices object
   factory PendingInvoices.fromJson(Map<String, dynamic> json) {
     _counter = 1;
-    return PendingInvoices(json['invoiceid'] ?? '', json['duedate'] ?? '', json['overduedays'] ?? '', (json['charges'] ?? 0.0).toDouble());
+    return PendingInvoices(json['invoiceid'] ?? '', json['duedate'] ?? '', json['overduedays'].toString() ?? '', double.parse(json['charges'] ?? 0.0));
   }
 
   // Convert PendingInvoices object to JSON (Map)
@@ -294,7 +294,8 @@ class PendingInvoices {
   }
 
   // Convert List<Map<String, dynamic>> to List<PendingInvoices>
-  static List<PendingInvoices> fromJsonList(List<Map<String, dynamic>> jsonList) {
+  static List<PendingInvoices> fromJsonList(List<Map<String, dynamic>>? jsonList) {
+    if (jsonList == null || jsonList.isEmpty) return [];
     return jsonList.map((json) => PendingInvoices.fromJson(json)).toList();
   }
 

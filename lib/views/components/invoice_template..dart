@@ -29,6 +29,7 @@ class InvoiceTemplate {
     // Create PDF document
     final doc = pw.Document();
 
+    // First page (Main invoice)
     doc.addPage(
       pw.MultiPage(
         pageTheme: pw.PageTheme(pageFormat: PdfPageFormat.a4, margin: const pw.EdgeInsets.only(left: 20, right: 20, bottom: 20)),
@@ -43,29 +44,104 @@ class InvoiceTemplate {
               contentTable(context),
               pw.SizedBox(height: 10),
               tax_table(context),
-
-              pending_contentTable(context),
-              pw.SizedBox(height: 10),
-              pending_final_amount(context),
-              pw.SizedBox(height: 40),
-              pw.Align(
-                alignment: pw.Alignment.center,
-                child: pw.Text(
-                  '*** This list was created because there are pending invoices. ***',
-                  style: pw.TextStyle(
-                    font: Helvetica,
-                    fontSize: 12.toDouble(),
-                    color: PdfColors.grey500,
-                    // fontWeight: pw.FontWeight.bold,
-                  ),
-                ),
-              ),
             ],
       ),
     );
+
+    // Second page (Pending section)
+    if (instInvoice.pendingInvoices.isNotEmpty) {
+      doc.addPage(
+        pw.MultiPage(
+          pageTheme: pw.PageTheme(pageFormat: PdfPageFormat.a4, margin: const pw.EdgeInsets.only(left: 20, right: 20, bottom: 20)),
+          header: (context) => pending_header(context),
+          footer: (context) => footer(context),
+          build:
+              (context) => [
+                pending_contentTable(context),
+                pw.SizedBox(height: 10),
+                pending_final_amount(context),
+                pw.SizedBox(height: 40),
+                pw.Align(
+                  alignment: pw.Alignment.center,
+                  child: pw.Text('*** This list was created because there are pending invoices. ***', style: pw.TextStyle(font: Helvetica, fontSize: 12.toDouble(), color: PdfColors.grey500)),
+                ),
+              ],
+        ),
+      );
+    }
+
     // InvoicependingTemplate(instInvoice: instInvoice).buildPdf(PdfPageFormat.a4, doc);
     // Return the PDF file as a Uint8List
     return doc.save();
+  }
+
+  pw.Widget pending_header(pw.Context context) {
+    return pw.Container(
+      child: pw.Column(
+        children: [
+          pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.center,
+            crossAxisAlignment: pw.CrossAxisAlignment.center,
+            children: [
+              // pw.Align(alignment: pw.Alignment.centerLeft, child: pw.Container(padding: const pw.EdgeInsets.only(bottom: 0, left: 0), height: 80, child: pw.Image(profileImage))),
+              pw.Padding(padding: const pw.EdgeInsets.all(30), child: pw.Text('PENDING INVOICES', style: pw.TextStyle(fontSize: 15, fontWeight: pw.FontWeight.bold, color: accentColor))),
+              // pw.Align(
+              //   alignment: pw.Alignment.centerRight,
+              //   child: pw.Container(
+              //     height: 120,
+              //     child: pw.Row(
+              //       children: [
+              //         pw.Column(
+              //           mainAxisAlignment: pw.MainAxisAlignment.center,
+              //           crossAxisAlignment: pw.CrossAxisAlignment.start,
+              //           children: [
+              //             regular('Date', 10),
+
+              //             // pw.SizedBox(height: 5),
+              //             // regular('Relationship ID', 10),
+              //           ],
+              //         ),
+              //         pw.Column(
+              //           mainAxisAlignment: pw.MainAxisAlignment.center,
+              //           crossAxisAlignment: pw.CrossAxisAlignment.start,
+              //           children: [
+              //             regular('  :  ', 10),
+
+              //             // pw.SizedBox(height: 5),
+              //             // regular('  :  ', 10),
+              //           ],
+              //         ),
+              //         pw.Column(
+              //           mainAxisAlignment: pw.MainAxisAlignment.center,
+              //           crossAxisAlignment: pw.CrossAxisAlignment.start,
+              //           children: [
+              //             pw.Container(
+              //               child: pw.Align(
+              //                 alignment: pw.Alignment.centerLeft,
+              //                 child: regular(formatDate(DateTime.now()), 10),
+              //                 // formatDate(DateTime.now()), 10
+              //               ),
+              //             ),
+
+              //             // pw.SizedBox(height: 5),
+              //             // pw.Container(
+              //             //   child: pw.Align(
+              //             //     alignment: pw.Alignment.centerLeft,
+              //             //     child: regular("3873870201", 10),
+              //             //   ),
+              //             // ),
+              //           ],
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
+            ],
+          ),
+          pw.SizedBox(height: 20),
+        ],
+      ),
+    );
   }
 
   pw.Widget header(pw.Context context) {

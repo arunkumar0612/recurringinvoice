@@ -31,14 +31,18 @@ class InvoiceServices {
     );
 
     ContactDetails contactDetails = ContactDetails(email: jsonData["contactdetails"]["emailid"], phone: jsonData["contactdetails"]["phoneno"]);
-    List<Map<String, dynamic>> jsonList = [
-      {"serialNo": "1", "invoiceid": "8734ADHD", "duedate": "06 Dec 2024", "overduedays": "10 days", "charges": 150},
-      {"serialNo": "2", "invoiceid": "87332DDH", "duedate": "10 Dec 2024", "overduedays": "8 days", "charges": 200},
-      {"serialNo": "3", "invoiceid": "87332DDH", "duedate": "06 Dec 2024", "overduedays": "25 days", "charges": 180},
-      {"serialNo": "4", "invoiceid": "87332DDH", "duedate": "06 Dec 2024", "overduedays": "11 days", "charges": 100},
-      {"serialNo": "5", "invoiceid": "87332DDH", "duedate": "06 Dec 2024", "overduedays": "15 days", "charges": 250},
-    ];
-    List<PendingInvoices> pendingInvoice = PendingInvoices.fromJsonList(jsonList);
+    // List<Map<String, dynamic>> jsonList = [
+    //   {"serialNo": "1", "invoiceid": "8734ADHD", "duedate": "06 Dec 2024", "overduedays": "10 days", "charges": 150},
+    //   {"serialNo": "2", "invoiceid": "87332DDH", "duedate": "10 Dec 2024", "overduedays": "8 days", "charges": 200},
+    //   {"serialNo": "3", "invoiceid": "87332DDH", "duedate": "06 Dec 2024", "overduedays": "25 days", "charges": 180},
+    //   {"serialNo": "4", "invoiceid": "87332DDH", "duedate": "06 Dec 2024", "overduedays": "11 days", "charges": 100},
+    //   {"serialNo": "5", "invoiceid": "87332DDH", "duedate": "06 Dec 2024", "overduedays": "15 days", "charges": 250},
+    // ];
+    List<PendingInvoices> pendingInvoice = [];
+
+    if (jsonData["previousPendingInvoices"] != null) {
+      pendingInvoice = PendingInvoices.fromJsonList((jsonData["previousPendingInvoices"] as List<dynamic>).map((e) => Map<String, dynamic>.from(e)).toList());
+    }
 
     // Parse Customer Account Details
     CustomerAccountDetails customerAccount = CustomerAccountDetails(
