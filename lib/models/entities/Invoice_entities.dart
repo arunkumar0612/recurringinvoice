@@ -12,7 +12,12 @@ class Site {
   final int siteID;
   final double monthlyCharges;
 
-  Site({required this.siteName, required this.address, required this.siteID, required this.monthlyCharges}) : serialNo = (_counter++).toString(); // Auto-increment serial number
+  Site({
+    required this.siteName,
+    required this.address,
+    required this.siteID,
+    required this.monthlyCharges,
+  }) : serialNo = (_counter++).toString(); // Auto-increment serial number
 
   // Convert List of JSON Maps to List of Site objects
   static List<Site> fromJson(List<Map<String, dynamic>> jsonList) {
@@ -35,7 +40,13 @@ class Site {
 
   // Convert single Site object to JSON
   Map<String, dynamic> toJson() {
-    return {'serialNo': serialNo, 'siteName': siteName, 'address': address, 'siteID': siteID, 'monthlyCharges': monthlyCharges};
+    return {
+      'serialNo': serialNo,
+      'siteName': siteName,
+      'address': address,
+      'siteID': siteID,
+      'monthlyCharges': monthlyCharges,
+    };
   }
 
   dynamic getIndex(int col) {
@@ -62,7 +73,12 @@ class Address {
   final String billingName;
   final String billingAddress;
 
-  Address({required this.clientName, required this.clientAddress, required this.billingName, required this.billingAddress});
+  Address({
+    required this.clientName,
+    required this.clientAddress,
+    required this.billingName,
+    required this.billingAddress,
+  });
 
   // Convert JSON to Address object
   factory Address.fromJson(Map<String, dynamic> json) {
@@ -76,24 +92,38 @@ class Address {
 
   // Convert Address object to JSON
   Map<String, dynamic> toJson() {
-    return {'clientName': clientName, 'clientAddress': clientAddress, 'billingName': billingName, 'billingAddress': billingAddress};
+    return {
+      'clientName': clientName,
+      'clientAddress': clientAddress,
+      'billingName': billingName,
+      'billingAddress': billingAddress,
+    };
   }
 }
 
 class ContactDetails {
   final String email;
+  final String ccEmail;
   final String phone;
 
-  ContactDetails({required this.email, required this.phone});
+  ContactDetails({
+    required this.email,
+    required this.ccEmail,
+    required this.phone,
+  });
 
   // Convert JSON to Address object
   factory ContactDetails.fromJson(Map<String, dynamic> json) {
-    return ContactDetails(email: json['emailid'] as String, phone: json['phoneno'] as String);
+    return ContactDetails(
+      email: json['emailid'] as String,
+      ccEmail: json['ccemail'] as String,
+      phone: json['phoneno'] as String,
+    );
   }
 
   // Convert Address object to JSON
   Map<String, dynamic> toJson() {
-    return {'email': email, 'phone': phone};
+    return {'email': email, "ccemail": ccEmail, 'phone': phone};
   }
 }
 
@@ -106,6 +136,10 @@ class BillPlanDetails {
   final String billDate;
   final String dueDate;
   final int subscriptionBillId;
+  final String planType;
+  final String billMode;
+  final String amountPaid;
+  final String pendingPayments;
 
   BillPlanDetails({
     required this.planName,
@@ -116,6 +150,10 @@ class BillPlanDetails {
     required this.billDate,
     required this.dueDate,
     required this.subscriptionBillId,
+    required this.planType,
+    required this.billMode,
+    required this.amountPaid,
+    required this.pendingPayments,
   });
 
   // Convert JSON to BillPlanDetails object
@@ -129,12 +167,28 @@ class BillPlanDetails {
       billDate: json['billDate'] as String,
       dueDate: json['dueDate'] as String,
       subscriptionBillId: json['subscription_billid'] as int,
+      planType: json['billmode'] as String,
+      billMode: json['plantype'] as String,
+      amountPaid: json['amountpaid'] as String,
+      pendingPayments: json['pendingpayments'] as String,
     );
   }
 
   // Convert BillPlanDetails object to JSON
   Map<String, dynamic> toJson() {
-    return {'planName': planName, 'customerType': customerType, 'planCharges': planCharges, 'internetCharges': internetCharges, 'billPeriod': billPeriod, 'billDate': billDate, 'dueDate': dueDate};
+    return {
+      'planName': planName,
+      'customerType': customerType,
+      'planCharges': planCharges,
+      'internetCharges': internetCharges,
+      'billPeriod': billPeriod,
+      'billDate': billDate,
+      'dueDate': dueDate,
+      "plantype": planType,
+      "billmode": billMode,
+      "amountpaid": amountPaid,
+      "pendingpayments": pendingPayments,
+    };
   }
 }
 
@@ -205,6 +259,7 @@ class Invoice {
   final FinalCalculation finalCalc;
   final List<String> notes;
   final List<PendingInvoices> pendingInvoices;
+
   Invoice({
     required this.date,
     required this.invoiceNo,
@@ -230,9 +285,17 @@ class Invoice {
       addressDetails: Address.fromJson(json['addressDetails']),
       billPlanDetails: BillPlanDetails.fromJson(json['billPlanDetails']),
       contactDetails: ContactDetails.fromJson(json['contactdetails']),
-      customerAccountDetails: CustomerAccountDetails.fromJson(json['customerAccDetails']),
-      siteData: Site.fromJson(List<Map<String, dynamic>>.from(json['siteData'])),
-      finalCalc: FinalCalculation.fromJson(Site.fromJson(List<Map<String, dynamic>>.from(json['siteData'])), json['gstPercent'] as int, json['pendingAmount'] as double),
+      customerAccountDetails: CustomerAccountDetails.fromJson(
+        json['customerAccDetails'],
+      ),
+      siteData: Site.fromJson(
+        List<Map<String, dynamic>>.from(json['siteData']),
+      ),
+      finalCalc: FinalCalculation.fromJson(
+        Site.fromJson(List<Map<String, dynamic>>.from(json['siteData'])),
+        json['gstPercent'] as int,
+        json['pendingAmount'] as double,
+      ),
       notes: ['This is a sample note', 'This is another sample note'],
       pendingInvoices: [],
     );
@@ -264,7 +327,9 @@ class Invoice {
       'billPlanDetails': billPlanDetails.toJson(),
       'contactdetails': contactDetails.toJson(),
       'customerAccDetails': customerAccountDetails.toJson(),
-      'siteData': Site.toJsonList(siteData), // Corrected Site List Serialization
+      'siteData': Site.toJsonList(
+        siteData,
+      ), // Corrected Site List Serialization
       'finalCalc': finalCalc.toJson(),
       'addressDetails': addressDetails.toJson(),
       'notes': notes,
@@ -280,21 +345,35 @@ class PendingInvoices {
   final String overduedays;
   final double charges;
 
-  PendingInvoices(this.invoiceid, this.duedate, this.overduedays, this.charges) : serialNo = (_counter++).toString();
+  PendingInvoices(this.invoiceid, this.duedate, this.overduedays, this.charges)
+    : serialNo = (_counter++).toString();
 
   // Convert JSON (Map) to PendingInvoices object
   factory PendingInvoices.fromJson(Map<String, dynamic> json) {
     _counter = 1;
-    return PendingInvoices(json['invoiceid'] ?? '', json['duedate'] ?? '', json['overduedays'].toString() ?? '', double.parse(json['charges'] ?? 0.0));
+    return PendingInvoices(
+      json['invoiceid'] ?? '',
+      json['duedate'] ?? '',
+      json['overduedays'].toString() ?? '',
+      double.parse(json['charges'] ?? 0.0),
+    );
   }
 
   // Convert PendingInvoices object to JSON (Map)
   Map<String, dynamic> toJson() {
-    return {'serialNo': serialNo, 'invoiceid': invoiceid, 'duedate': duedate, 'overduedays': overduedays, 'charges': charges};
+    return {
+      'serialNo': serialNo,
+      'invoiceid': invoiceid,
+      'duedate': duedate,
+      'overduedays': overduedays,
+      'charges': charges,
+    };
   }
 
   // Convert List<Map<String, dynamic>> to List<PendingInvoices>
-  static List<PendingInvoices> fromJsonList(List<Map<String, dynamic>>? jsonList) {
+  static List<PendingInvoices> fromJsonList(
+    List<Map<String, dynamic>>? jsonList,
+  ) {
     if (jsonList == null || jsonList.isEmpty) return [];
     return jsonList.map((json) => PendingInvoices.fromJson(json)).toList();
   }
@@ -338,7 +417,11 @@ class FinalCalculation {
     required this.grandTotal,
   });
 
-  factory FinalCalculation.fromJson(List<Site> sites, int gstPercent, double? pendingAmount) {
+  factory FinalCalculation.fromJson(
+    List<Site> sites,
+    int gstPercent,
+    double? pendingAmount,
+  ) {
     double subtotal = sites.fold(0.0, (sum, site) => sum + site.monthlyCharges);
     double cgst = (subtotal * (gstPercent / 2)) / 100;
     double sgst = (subtotal * (gstPercent / 2)) / 100;
@@ -359,12 +442,22 @@ class FinalCalculation {
   }
 
   Map<String, dynamic> toJson() {
-    return {'subtotal': subtotal, 'CGST': cgst, 'SGST': sgst, 'roundOff': roundOff, 'difference': differene, 'total': total, 'pendingAmount': pendingAmount, 'grandTotal': grandTotal};
+    return {
+      'subtotal': subtotal,
+      'CGST': cgst,
+      'SGST': sgst,
+      'roundOff': roundOff,
+      'difference': differene,
+      'total': total,
+      'pendingAmount': pendingAmount,
+      'grandTotal': grandTotal,
+    };
   }
 }
 
 class PostData {
   List<int> siteIds;
+  List<String> siteNames;
   int subscriptionBillId;
   int customerID;
   String clientAddressName;
@@ -380,9 +473,16 @@ class PostData {
   String date;
   int messageType;
   String feedback;
+  String planType;
+  String billMode;
+  String billPeriod;
+  String dueDate;
+  String amountpaid;
+  String pendingpayments;
 
   PostData({
     required this.siteIds,
+    required this.siteNames,
     required this.subscriptionBillId,
     required this.customerID,
     required this.clientAddressName,
@@ -398,6 +498,12 @@ class PostData {
     required this.date,
     required this.messageType,
     required this.feedback,
+    required this.planType,
+    required this.billMode,
+    required this.billPeriod,
+    required this.dueDate,
+    required this.amountpaid,
+    required this.pendingpayments,
   });
   // Map<String, dynamic> toJson() {
   //     return {
@@ -415,12 +521,15 @@ class PostData {
   //   }
   factory PostData.fromJson(Invoice data) {
     List<int> ids = [];
+    List<String> names = [];
     for (var site in data.siteData) {
       ids.add(site.siteID);
+      names.add(site.siteName);
     }
 
     return PostData(
       siteIds: ids,
+      siteNames: names,
       subscriptionBillId: data.billPlanDetails.subscriptionBillId,
       customerID: data.customerAccountDetails.customerID,
       clientAddressName: data.addressDetails.clientName,
@@ -429,19 +538,26 @@ class PostData {
       billingAddress: data.addressDetails.billingName,
       planName: data.billPlanDetails.planName,
       emailId: data.contactDetails.email,
-      ccEmail: data.contactDetails.email,
+      ccEmail: data.contactDetails.ccEmail,
       phoneNo: data.contactDetails.phone,
       totalAmount: data.finalCalc.grandTotal.toString(),
       invoiceGenId: data.invoiceNo,
       date: data.date,
       messageType: 3,
       feedback: "",
+      planType: data.billPlanDetails.planType,
+      billMode: data.billPlanDetails.billMode,
+      billPeriod: data.billPlanDetails.billPeriod,
+      dueDate: data.billPlanDetails.dueDate,
+      amountpaid: data.billPlanDetails.amountPaid,
+      pendingpayments: data.billPlanDetails.pendingPayments,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       "siteids": siteIds,
+      "sitenames": siteNames,
       "subscriptionbillid": subscriptionBillId,
       "customerid": customerID,
       "clientaddressname": clientAddressName,
@@ -457,6 +573,12 @@ class PostData {
       "date": date,
       "messagetype": messageType,
       "feedback": feedback,
+      "plantype": planType,
+      "billmode": billMode,
+      "billperiod": billPeriod,
+      "duedate": dueDate,
+      "amountpaid": amountpaid,
+      "pendingpayments": pendingpayments,
     };
   }
 }

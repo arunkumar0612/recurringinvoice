@@ -8,26 +8,39 @@ import 'package:recurring_invoice/services/Invoice_services.dart';
 import 'package:recurring_invoice/services/webSocket_services.dart';
 import 'package:recurring_invoice/views/components/invoice_template..dart';
 
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart'; // assuming you're using pdf package
+
 class Generators {
   // ignore: non_constant_identifier_names
-  static Future<InvoiceResult> InvoiceGenerator(Map<String, dynamic> jsonResponse) async {
+  static Future<InvoiceResult> InvoiceGenerator(
+    Map<String, dynamic> jsonResponse,
+  ) async {
     // Parse invoice from JSON
     Invoice invoice = InvoiceServices.parseInvoice(jsonResponse);
-    // print(invoice.toJson()); // Verify the parsed invoice
 
-    // Define file paths
-    String mainFilepath = 'E:/RecurringInvoices/${invoice.invoiceNo}.pdf';
-    File mainFile = File(mainFilepath);
-    Uint8List GeneratedInvoice = await InvoiceTemplate(instInvoice: invoice).buildPdf(PdfPageFormat.a4);
-    mainFile.writeAsBytes(GeneratedInvoice);
-    // String savePath = "$selectedDirectory/$filename.pdf";
-    // await mainFile.copy(mainFilepath);
-    WebsocketServices.mailSenderList.add(mainFile);
-    WebsocketServices.InvoicesList.add(InvoiceResult(files: [mainFile], invoice: invoice));
-    // print("*************************************************${WebsocketServices.mailSenderList}");
-    InvoiceResult(files: [mainFile], invoice: invoice);
+    // Get the system temp directory
+    Directory tempDir = await getTemporaryDirectory();
+    String tempFilePath = '${tempDir.path}/${invoice.invoiceNo}.pdf';
 
-    return InvoiceResult(files: [mainFile], invoice: invoice);
+    // Generate PDF
+    Uint8List generatedInvoice = await InvoiceTemplate(
+      instInvoice: invoice,
+    ).buildPdf(PdfPageFormat.a4);
+
+    // Write to file
+    File tempFile = File(tempFilePath);
+    await tempFile.writeAsBytes(generatedInvoice);
+
+    // Add to websocket services
+    WebsocketServices.mailSenderList.add(tempFile);
+    WebsocketServices.InvoicesList.add(
+      InvoiceResult(files: [tempFile], invoice: invoice),
+    );
+
+    return InvoiceResult(files: [tempFile], invoice: invoice);
   }
 }
 

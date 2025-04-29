@@ -23,14 +23,23 @@ class InvoiceServices {
       planName: jsonData["billplandetails"]["planname"],
       customerType: jsonData["billplandetails"]["customertype"],
       planCharges: jsonData["billplandetails"]["plancharges"],
-      internetCharges: (jsonData["billplandetails"]["internetcharges"] as num).toDouble(),
+      internetCharges:
+          (jsonData["billplandetails"]["internetcharges"] as num).toDouble(),
       billPeriod: jsonData["billplandetails"]["billperiod"],
       billDate: jsonData["billplandetails"]["billdate"],
       dueDate: jsonData["billplandetails"]["duedate"],
       subscriptionBillId: jsonData['billplandetails']['subscription_billid'],
+      billMode: jsonData["billplandetails"]["billmode"],
+      planType: jsonData["billplandetails"]["plantype"],
+      pendingPayments: jsonData["billplandetails"]["pendingpayments"],
+      amountPaid: jsonData["billplandetails"]["amountpaid"],
     );
 
-    ContactDetails contactDetails = ContactDetails(email: jsonData["contactdetails"]["emailid"], phone: jsonData["contactdetails"]["phoneno"]);
+    ContactDetails contactDetails = ContactDetails(
+      email: jsonData["contactdetails"]["emailid"],
+      ccEmail: jsonData["contactdetails"]["ccemail"],
+      phone: jsonData["contactdetails"]["phoneno"],
+    );
     // List<Map<String, dynamic>> jsonList = [
     //   {"serialNo": "1", "invoiceid": "8734ADHD", "duedate": "06 Dec 2024", "overduedays": "10 days", "charges": 150},
     //   {"serialNo": "2", "invoiceid": "87332DDH", "duedate": "10 Dec 2024", "overduedays": "8 days", "charges": 200},
@@ -41,12 +50,17 @@ class InvoiceServices {
     List<PendingInvoices> pendingInvoice = [];
 
     if (jsonData["previousPendingInvoices"] != null) {
-      pendingInvoice = PendingInvoices.fromJsonList((jsonData["previousPendingInvoices"] as List<dynamic>).map((e) => Map<String, dynamic>.from(e)).toList());
+      pendingInvoice = PendingInvoices.fromJsonList(
+        (jsonData["previousPendingInvoices"] as List<dynamic>)
+            .map((e) => Map<String, dynamic>.from(e))
+            .toList(),
+      );
     }
 
     // Parse Customer Account Details
     CustomerAccountDetails customerAccount = CustomerAccountDetails(
-      consolidate_email: jsonData["customeraccountdetails"]["consolidate_email"],
+      consolidate_email:
+          jsonData["customeraccountdetails"]["consolidate_email"],
       customerID: jsonData["customeraccountdetails"]["customerid"],
       relationshipId: jsonData["customeraccountdetails"]["relationshipid"],
       billNumber: jsonData["customeraccountdetails"]["billnumber"],
@@ -59,13 +73,22 @@ class InvoiceServices {
 
     List<Site> sites = Site.fromJson(
       (jsonData["sitesubscription"] as List)
-          .map((site) => site as Map<String, dynamic>) // Explicitly cast each item
+          .map(
+            (site) => site as Map<String, dynamic>,
+          ) // Explicitly cast each item
           .toList(),
     );
 
     int gstPercent = jsonData["gstPercent"];
-    double? pendingAmount = jsonData["pendingAmount"] != null ? (jsonData["pendingAmount"] as num).toDouble() : null;
-    FinalCalculation finalCalc = FinalCalculation.fromJson(sites, gstPercent, pendingAmount);
+    double? pendingAmount =
+        jsonData["pendingAmount"] != null
+            ? (jsonData["pendingAmount"] as num).toDouble()
+            : null;
+    FinalCalculation finalCalc = FinalCalculation.fromJson(
+      sites,
+      gstPercent,
+      pendingAmount,
+    );
     return Invoice(
       date: jsonData["date"],
       invoiceNo: jsonData["invoiceNo"],
@@ -77,12 +100,18 @@ class InvoiceServices {
       customerAccountDetails: customerAccount,
       siteData: sites,
       finalCalc: finalCalc,
-      notes: ['This is a system generated invoice hence do not require signature.', 'Please make the payment on or before the due date.'],
+      notes: [
+        'This is a system generated invoice hence do not require signature.',
+        'Please make the payment on or before the due date.',
+      ],
       pendingInvoices: pendingInvoice,
     );
   }
 
-  static dynamic apicall(List<InvoiceResult> Invoices, List<File> GeneratedInvoices) async {
+  static dynamic apicall(
+    List<InvoiceResult> Invoices,
+    List<File> GeneratedInvoices,
+  ) async {
     try {
       List<PostData> jsonClub = [];
 
@@ -90,17 +119,29 @@ class InvoiceServices {
         PostData salesData = PostData.fromJson(Invoices[i].invoice);
         jsonClub.add(salesData);
       }
-      print("jsonclub : ${jsonClub.length} GeneratedInvoices : ${GeneratedInvoices.length}");
-      await send_data(jsonEncode(jsonClub.map((e) => e.toJson()).toList()), GeneratedInvoices);
+      print(
+        "jsonclub : ${jsonClub.length} GeneratedInvoices : ${GeneratedInvoices.length}",
+      );
+      await send_data(
+        jsonEncode(jsonClub.map((e) => e.toJson()).toList()),
+        GeneratedInvoices,
+      );
     } catch (e) {
       print(e);
       // await Basic_dialog(context: context, title: "POST", content: "$e", onOk: () {}, showCancel: false);
     }
   }
 
-  static dynamic send_data(String jsonData, List<File> GeneratedInvoices) async {
+  static dynamic send_data(
+    String jsonData,
+    List<File> GeneratedInvoices,
+  ) async {
     try {
-      Map<String, dynamic>? response = await apiController.Multer(jsonData, GeneratedInvoices, "http://192.168.0.200:8081/subscription/addrecurringinvoice");
+      Map<String, dynamic>? response = await apiController.Multer(
+        jsonData,
+        GeneratedInvoices,
+        "http://192.168.0.200:8081/subscription/addrecurringinvoice",
+      );
       if (response['statusCode'] == 200) {
         // print(response['data']);
         // CMDmResponse value = CMDmResponse.fromJson(response);
