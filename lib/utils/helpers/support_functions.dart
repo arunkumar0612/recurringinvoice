@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:intl/intl.dart';
@@ -79,6 +80,32 @@ pw.Widget regular(String value, int size) {
   );
 }
 
+pw.Widget footerRegular(String value, int size) {
+  // loadFont();
+  return pw.Text(
+    value,
+    style: pw.TextStyle(
+      font: Helvetica,
+      fontSize: size.toDouble(),
+      color: PdfColors.black,
+      // fontWeight: pw.FontWeight.bold,
+    ),
+  );
+}
+
+pw.Widget footerBold(value, size) {
+  // loadFont();
+  return pw.Text(
+    value,
+    style: pw.TextStyle(
+      font: Helvetica_bold,
+      fontSize: size.toDouble(),
+      color: PdfColors.black,
+      // fontWeight: pw.FontWeight.bold,
+    ),
+  );
+}
+
 pw.Widget bold(value, size) {
   // loadFont();
   return pw.Text(
@@ -97,4 +124,15 @@ String generateRandomString(int length) {
   Random random = Random();
 
   return List.generate(length, (index) => chars[random.nextInt(chars.length)]).join('');
+}
+
+bool isGST_Local(String gstNumber) {
+  // Check if the GST number is valid and has at least 2 characters
+  if (gstNumber.length < 2) return false;
+
+  // Extract the first two digits (state code)
+  String stateCode = gstNumber.substring(0, 2);
+
+  // Return true if Tamil Nadu (33), else false
+  return stateCode == '33';
 }

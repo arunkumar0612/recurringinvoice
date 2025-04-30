@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:recurring_invoice/models/entities/Invoice_entities.dart';
 import 'package:recurring_invoice/services/Invoice_services.dart';
@@ -13,23 +14,39 @@ class Generators {
   static Future<InvoiceResult> InvoiceGenerator(Map<String, dynamic> jsonResponse) async {
     // Parse invoice from JSON
     Invoice invoice = InvoiceServices.parseInvoice(jsonResponse);
-    // print(invoice.toJson()); // Verify the parsed invoice
 
-    // Define file paths
-    String mainFilepath = 'E:/RecurringInvoices/${invoice.invoiceNo}.pdf';
-    File mainFile = File(mainFilepath);
-    Uint8List GeneratedInvoice = await InvoiceTemplate(instInvoice: invoice).buildPdf(PdfPageFormat.a4);
-    mainFile.writeAsBytes(GeneratedInvoice);
-    // String savePath = "$selectedDirectory/$filename.pdf";
-    // await mainFile.copy(mainFilepath);
-    WebsocketServices.mailSenderList.add(mainFile);
-    WebsocketServices.InvoicesList.add(InvoiceResult(files: [mainFile], invoice: invoice));
-    // print("*************************************************${WebsocketServices.mailSenderList}");
-    InvoiceResult(files: [mainFile], invoice: invoice);
+    // Replace slashes in invoice number for safe file/folder naming
+    String safeInvoiceNo = invoice.invoiceNo.replaceAll('/', '-');
 
-    return InvoiceResult(files: [mainFile], invoice: invoice);
+    // Get the system temp directory
+    Directory tempDir = await getTemporaryDirectory();
+
+    // Create folder path
+    String folderPath = '${tempDir.path}/$safeInvoiceNo';
+    Directory folder = Directory(folderPath);
+
+    // Ensure the folder exists
+    if (!await folder.exists()) {
+      await folder.create(recursive: true);
+    }
+
+    String tempFilePath = '$folderPath/$safeInvoiceNo.pdf';
+
+    // Generate PDF
+    Uint8List generatedInvoice = await InvoiceTemplate(instInvoice: invoice).buildPdf(PdfPageFormat.a4);
+
+    // Write to file
+    File tempFile = File(tempFilePath);
+    await tempFile.writeAsBytes(generatedInvoice);
+
+    // Add to websocket services
+    WebsocketServices.mailSenderList.add(tempFile);
+    WebsocketServices.InvoicesList.add(InvoiceResult(files: [tempFile], invoice: invoice));
+
+    return InvoiceResult(files: [tempFile], invoice: invoice);
   }
 }
+
 
 
 

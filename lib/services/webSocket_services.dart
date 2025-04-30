@@ -56,7 +56,7 @@ class WebsocketServices {
                     Generators.InvoiceGenerator(groupedbyCompanyid[companyIds[i]]!['individual']![ind]);
                     await Future.delayed(const Duration(milliseconds: 2000));
                     await InvoiceServices.apicall(InvoicesList, mailSenderList);
-                    await Future.delayed(const Duration(milliseconds: 4000));
+                    await Future.delayed(const Duration(milliseconds: 2000));
                     mailSenderList.clear();
                     InvoicesList.clear();
                   }

@@ -28,9 +28,15 @@ class InvoiceServices {
       billDate: jsonData["billplandetails"]["billdate"],
       dueDate: jsonData["billplandetails"]["duedate"],
       subscriptionBillId: jsonData['billplandetails']['subscription_billid'],
+      billMode: jsonData["billplandetails"]["billmode"],
+      planType: jsonData["billplandetails"]["plantype"],
+      pendingPayments: jsonData["billplandetails"]["pendingpayments"],
+      amountPaid: jsonData["billplandetails"]["amountpaid"],
+      tdsDeductions: jsonData["billplandetails"]["tdsdeductions"],
+      showPending: jsonData["billplandetails"]["showpending"],
     );
 
-    ContactDetails contactDetails = ContactDetails(email: jsonData["contactdetails"]["emailid"], phone: jsonData["contactdetails"]["phoneno"]);
+    ContactDetails contactDetails = ContactDetails(email: jsonData["contactdetails"]["emailid"], ccEmail: jsonData["contactdetails"]["ccemail"], phone: jsonData["contactdetails"]["phoneno"]);
     // List<Map<String, dynamic>> jsonList = [
     //   {"serialNo": "1", "invoiceid": "8734ADHD", "duedate": "06 Dec 2024", "overduedays": "10 days", "charges": 150},
     //   {"serialNo": "2", "invoiceid": "87332DDH", "duedate": "10 Dec 2024", "overduedays": "8 days", "charges": 200},
@@ -79,6 +85,7 @@ class InvoiceServices {
       finalCalc: finalCalc,
       notes: ['This is a system generated invoice hence do not require signature.', 'Please make the payment on or before the due date.'],
       pendingInvoices: pendingInvoice,
+      totalcaculationtable: TotalcaculationTable(previousdues: "15000", payment: "34343", adjustments_deduction: "32", currentcharges: "34", totalamountdue: "34343"),
     );
   }
 
@@ -91,7 +98,11 @@ class InvoiceServices {
         jsonClub.add(salesData);
       }
       print("jsonclub : ${jsonClub.length} GeneratedInvoices : ${GeneratedInvoices.length}");
-      await send_data(jsonEncode(jsonClub.map((e) => e.toJson()).toList()), GeneratedInvoices);
+      if (jsonClub.isNotEmpty && GeneratedInvoices.isNotEmpty && (jsonClub.length == GeneratedInvoices.length)) {
+        await send_data(jsonEncode(jsonClub.map((e) => e.toJson()).toList()), GeneratedInvoices);
+      } else {
+        print("API not triggered!");
+      }
     } catch (e) {
       print(e);
       // await Basic_dialog(context: context, title: "POST", content: "$e", onOk: () {}, showCancel: false);
