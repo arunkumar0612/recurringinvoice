@@ -365,6 +365,7 @@ class FinalCalculation {
 
 class PostData {
   List<int> siteIds;
+  List<String> siteNames;
   int subscriptionBillId;
   int customerID;
   String clientAddressName;
@@ -383,6 +384,7 @@ class PostData {
 
   PostData({
     required this.siteIds,
+    required this.siteNames,
     required this.subscriptionBillId,
     required this.customerID,
     required this.clientAddressName,
@@ -415,12 +417,15 @@ class PostData {
   //   }
   factory PostData.fromJson(Invoice data) {
     List<int> ids = [];
+    List<String> names = [];
     for (var site in data.siteData) {
       ids.add(site.siteID);
+      names.add(site.siteName);
     }
 
     return PostData(
       siteIds: ids,
+      siteNames: names,
       subscriptionBillId: data.billPlanDetails.subscriptionBillId,
       customerID: data.customerAccountDetails.customerID,
       clientAddressName: data.addressDetails.clientName,
@@ -442,6 +447,7 @@ class PostData {
   Map<String, dynamic> toJson() {
     return {
       "siteids": siteIds,
+      "sitenames": siteNames,
       "subscriptionbillid": subscriptionBillId,
       "customerid": customerID,
       "clientaddressname": clientAddressName,
