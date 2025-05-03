@@ -11,39 +11,48 @@ import 'package:recurring_invoice/views/components/invoice_template..dart';
 
 class Generators {
   // ignore: non_constant_identifier_names
-  static Future<InvoiceResult> InvoiceGenerator(Map<String, dynamic> jsonResponse) async {
-    // Parse invoice from JSON
-    Invoice invoice = InvoiceServices.parseInvoice(jsonResponse);
+  static Future<InvoiceResult?> InvoiceGenerator(Map<String, dynamic> jsonResponse) async {
+    try {
+      // Parse invoice from JSON
+      Invoice invoice = InvoiceServices.parseInvoice(jsonResponse);
 
-    // Replace slashes in invoice number for safe file/folder naming
-    String safeInvoiceNo = invoice.invoiceNo.replaceAll('/', '-');
+      // Replace slashes in invoice number for safe file/folder naming
+      String safeInvoiceNo = invoice.invoiceNo.replaceAll('/', '-');
 
-    // Get the system temp directory
-    Directory tempDir = await getTemporaryDirectory();
+      // Get the system temp directory
+      Directory tempDir = await getTemporaryDirectory();
 
-    // Create folder path
-    String folderPath = '${tempDir.path}/$safeInvoiceNo';
-    Directory folder = Directory(folderPath);
+      // Create folder path
+      String folderPath = '${tempDir.path}/$safeInvoiceNo';
+      Directory folder = Directory(folderPath);
 
-    // Ensure the folder exists
-    if (!await folder.exists()) {
-      await folder.create(recursive: true);
+      // Ensure the folder exists
+      if (!await folder.exists()) {
+        await folder.create(recursive: true);
+      }
+
+      String tempFilePath = '$folderPath/$safeInvoiceNo.pdf';
+
+      // Generate PDF
+      Uint8List generatedInvoice = await InvoiceTemplate(instInvoice: invoice).buildPdf(PdfPageFormat.a4);
+
+      // Write to file
+      File tempFile = File(tempFilePath);
+      await tempFile.writeAsBytes(generatedInvoice);
+
+      // Add to websocket services
+      WebsocketServices.mailSenderList.add(tempFile);
+      WebsocketServices.InvoicesList.add(InvoiceResult(files: [tempFile], invoice: invoice));
+
+      return InvoiceResult(files: [tempFile], invoice: invoice);
+    } catch (e) {
+      Invoice invoice = InvoiceServices.parseInvoice(jsonResponse);
+
+      // Replace slashes in invoice number for safe file/folder naming
+      String safeInvoiceNo = invoice.invoiceNo.replaceAll('/', '-');
+      print("Generation error :$e ,............................... $safeInvoiceNo");
+      return null;
     }
-
-    String tempFilePath = '$folderPath/$safeInvoiceNo.pdf';
-
-    // Generate PDF
-    Uint8List generatedInvoice = await InvoiceTemplate(instInvoice: invoice).buildPdf(PdfPageFormat.a4);
-
-    // Write to file
-    File tempFile = File(tempFilePath);
-    await tempFile.writeAsBytes(generatedInvoice);
-
-    // Add to websocket services
-    WebsocketServices.mailSenderList.add(tempFile);
-    WebsocketServices.InvoicesList.add(InvoiceResult(files: [tempFile], invoice: invoice));
-
-    return InvoiceResult(files: [tempFile], invoice: invoice);
   }
 }
 

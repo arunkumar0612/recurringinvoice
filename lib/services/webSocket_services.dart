@@ -29,7 +29,7 @@ class WebsocketServices {
               // print('Ressssssssssssssssssceived: $allSites');
               Map<String, Map<String, List<Map<String, dynamic>>>> groupedbyCompanyid = {};
               List<String> companyIds = [];
-
+              print("Total Sites       :            ${allSites.length}");
               // Grouping by company_ID
               for (var site in allSites) {
                 final contactDetails = site['customeraccountdetails'] as Map<String, dynamic>?;
@@ -47,15 +47,14 @@ class WebsocketServices {
                   groupedbyCompanyid[companyId]!['consolidate']!.add(site);
                 }
               }
-
-              print(groupedbyCompanyid.length);
-
+              int count = 0;
               for (int i = 0; i < groupedbyCompanyid.length; i++) {
                 if (groupedbyCompanyid[companyIds[i]]!['individual']!.isNotEmpty) {
                   for (int ind = 0; ind < groupedbyCompanyid[companyIds[i]]!['individual']!.length; ind++) {
                     Generators.InvoiceGenerator(groupedbyCompanyid[companyIds[i]]!['individual']![ind]);
                     await Future.delayed(const Duration(milliseconds: 2000));
-                    await InvoiceServices.apicall(InvoicesList, mailSenderList);
+                    count++;
+                    await InvoiceServices.apicall(InvoicesList, mailSenderList, count);
                     await Future.delayed(const Duration(milliseconds: 2000));
                     mailSenderList.clear();
                     InvoicesList.clear();
@@ -67,7 +66,8 @@ class WebsocketServices {
                     Generators.InvoiceGenerator(groupedbyCompanyid[companyIds[i]]!['consolidate']![cons]);
                     await Future.delayed(const Duration(milliseconds: 2000));
                   }
-                  await InvoiceServices.apicall(InvoicesList, mailSenderList);
+                  count++;
+                  await InvoiceServices.apicall(InvoicesList, mailSenderList, count);
                   await Future.delayed(const Duration(milliseconds: 8000));
                   mailSenderList.clear();
                   InvoicesList.clear();

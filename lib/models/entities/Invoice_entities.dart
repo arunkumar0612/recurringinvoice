@@ -118,30 +118,30 @@ class ContactDetails {
   }
 }
 
-class TotalcaculationTable {
-  final String previousdues;
-  final String payment;
-  final String adjustments_deduction;
-  final String currentcharges;
-  final String totalamountdue;
-  TotalcaculationTable({required this.previousdues, required this.payment, required this.adjustments_deduction, required this.currentcharges, required this.totalamountdue});
+// class TotalcaculationTable {
+//   final String previousdues;
+//   final String payment;
+//   final String adjustments_deduction;
+//   final String currentcharges;
+//   final String totalamountdue;
+//   TotalcaculationTable({required this.previousdues, required this.payment, required this.adjustments_deduction, required this.currentcharges, required this.totalamountdue});
 
-  // Convert JSON to Address object
-  factory TotalcaculationTable.fromJson(Map<String, dynamic> json) {
-    return TotalcaculationTable(
-      previousdues: json['previousdues'] as String,
-      payment: json['payment'] as String,
-      adjustments_deduction: json['adjustments_deduction'] as String,
-      currentcharges: json['currentcharges'] as String,
-      totalamountdue: json['totalamountdue'] as String,
-    );
-  }
+//   // Convert JSON to Address object
+//   factory TotalcaculationTable.fromJson(Map<String, dynamic> json) {
+//     return TotalcaculationTable(
+//       previousdues: json['previousdues'] as String,
+//       payment: json['payment'] as String,
+//       adjustments_deduction: json['adjustments_deduction'] as String,
+//       currentcharges: json['currentcharges'] as String,
+//       totalamountdue: json['totalamountdue'] as String,
+//     );
+//   }
 
-  // Convert Address object to JSON
-  Map<String, dynamic> toJson() {
-    return {'previousdues': previousdues, 'payment': payment, 'adjustments_deduction': adjustments_deduction, 'currentcharges': currentcharges, 'totalamountdue': totalamountdue};
-  }
-}
+//   // Convert Address object to JSON
+//   Map<String, dynamic> toJson() {
+//     return {'previousdues': previousdues, 'payment': payment, 'adjustments_deduction': adjustments_deduction, 'currentcharges': currentcharges, 'totalamountdue': totalamountdue};
+//   }
+// }
 
 class BillPlanDetails {
   final String planName;
@@ -283,7 +283,7 @@ class Invoice {
   final FinalCalculation finalCalc;
   final List<String> notes;
   final List<PendingInvoices> pendingInvoices;
-  final TotalcaculationTable totalcaculationtable;
+  // final TotalcaculationTable totalcaculationtable;
 
   Invoice({
     required this.date,
@@ -298,7 +298,7 @@ class Invoice {
     required this.finalCalc,
     required this.notes,
     required this.pendingInvoices,
-    required this.totalcaculationtable,
+    // required this.totalcaculationtable,
   });
 
   // Convert JSON to Invoice object
@@ -316,7 +316,7 @@ class Invoice {
       finalCalc: FinalCalculation.fromJson(Site.fromJson(List<Map<String, dynamic>>.from(json['siteData'])), json['gstPercent'] as int, json['pendingAmount'] as double),
       notes: ['This is a sample note', 'This is another sample note'],
       pendingInvoices: [],
-      totalcaculationtable: TotalcaculationTable.fromJson(json['totalcaculationtable']),
+      // totalcaculationtable: TotalcaculationTable.fromJson(json['totalcaculationtable']),
     );
   }
 
@@ -333,7 +333,7 @@ class Invoice {
       'finalCalc': finalCalc.toJson(),
       'addressDetails': addressDetails.toJson(),
       'notes': notes.map((e) => e.trim()).toList(),
-      'totalcaculationtable': totalcaculationtable,
+      // 'totalcaculationtable': totalcaculationtable,
     };
   }
 }
@@ -351,7 +351,7 @@ class PendingInvoices {
   // Convert JSON (Map) to PendingInvoices object
   factory PendingInvoices.fromJson(Map<String, dynamic> json) {
     _counter = 1;
-    return PendingInvoices(json['invoiceid'] ?? '', json['duedate'] ?? '', json['overduedays'].toString() ?? '', double.parse(json['charges'] ?? 0.0));
+    return PendingInvoices(json['invoiceid'] ?? '', json['duedate'] ?? '', json['overduedays'].toString(), double.parse(json['charges'] ?? 0.0));
   }
 
   // Convert PendingInvoices object to JSON (Map)

@@ -36,7 +36,7 @@ class Invoker extends GetxController {
 
   Future<Map<String, dynamic>?> GetbyToken(String API) async {
     final configData = await Returns.loadConfigFile('assets/key.config');
-    final apiKey = configData['APIkey'];
+    // final apiKey = configData['APIkey'];
     final secret = configData['Secret'];
     final requestData = {"STOKEN": secret};
     final response = await apiService.postData(API, requestData);
@@ -57,7 +57,7 @@ class Invoker extends GetxController {
 
   Future<Map<String, dynamic>?> GetbyQueryString(Map<String, dynamic> body, String API) async {
     final configData = await Returns.loadConfigFile('assets/key.config');
-    final apiKey = configData['APIkey'];
+    // final apiKey = configData['APIkey'];
     final secret = configData['Secret'];
     final dataToEncrypt = jsonEncode(body);
     final encryptedData = AES.encryptWithAES(secret, dataToEncrypt);
@@ -81,7 +81,7 @@ class Invoker extends GetxController {
 
   Future<Map<String, dynamic>?> multiPart(File file, String API) async {
     final configData = await Returns.loadConfigFile('assets/key.config');
-    final apiKey = configData['APIkey'];
+    // final apiKey = configData['APIkey'];
     final secret = configData['Secret'];
     FormData formData = FormData({
       "file": MultipartFile(file, filename: file.path.split('/').last), // Attach file
@@ -111,7 +111,7 @@ class Invoker extends GetxController {
   ) async {
     // Load config file for API keys
     final configData = await Returns.loadConfigFile('assets/key.config');
-    final apiKey = configData['APIkey'];
+    // final apiKey = configData['APIkey'];
     final secret = configData['Secret'];
     final encryptedData = AES.encryptWithAES(secret, body);
 
@@ -138,7 +138,7 @@ class Invoker extends GetxController {
 
   Future<Map<String, dynamic>> SendByQuerystring(String body, String API) async {
     final configData = await Returns.loadConfigFile('assets/key.config');
-    final apiKey = configData['APIkey'];
+    // final apiKey = configData['APIkey'];
     final secret = configData['Secret'];
     final encryptedData = AES.encryptWithAES(secret, body);
 

@@ -85,11 +85,11 @@ class InvoiceServices {
       finalCalc: finalCalc,
       notes: ['This is a system generated invoice hence do not require signature.', 'Please make the payment on or before the due date.'],
       pendingInvoices: pendingInvoice,
-      totalcaculationtable: TotalcaculationTable(previousdues: "15000", payment: "34343", adjustments_deduction: "32", currentcharges: "34", totalamountdue: "34343"),
+      // totalcaculationtable: TotalcaculationTable(previousdues: "15000", payment: "34343", adjustments_deduction: "32", currentcharges: "34", totalamountdue: "34343"),
     );
   }
 
-  static dynamic apicall(List<InvoiceResult> Invoices, List<File> GeneratedInvoices) async {
+  static dynamic apicall(List<InvoiceResult> Invoices, List<File> GeneratedInvoices, int count) async {
     try {
       List<PostData> jsonClub = [];
 
@@ -97,7 +97,7 @@ class InvoiceServices {
         PostData salesData = PostData.fromJson(Invoices[i].invoice);
         jsonClub.add(salesData);
       }
-      print("jsonclub : ${jsonClub.length} GeneratedInvoices : ${GeneratedInvoices.length}");
+      print("jsonclub : ${jsonClub.length} GeneratedInvoices : ${GeneratedInvoices.length}.................. count : $count");
       if (jsonClub.isNotEmpty && GeneratedInvoices.isNotEmpty && (jsonClub.length == GeneratedInvoices.length)) {
         await send_data(jsonEncode(jsonClub.map((e) => e.toJson()).toList()), GeneratedInvoices);
       } else {
