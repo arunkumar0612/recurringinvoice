@@ -283,6 +283,7 @@ class Invoice {
   final FinalCalculation finalCalc;
   final List<String> notes;
   final List<PendingInvoices> pendingInvoices;
+  Map<String, dynamic> billdetails;
   // final TotalcaculationTable totalcaculationtable;
 
   Invoice({
@@ -298,6 +299,7 @@ class Invoice {
     required this.finalCalc,
     required this.notes,
     required this.pendingInvoices,
+    required this.billdetails,
     // required this.totalcaculationtable,
   });
 
@@ -316,6 +318,7 @@ class Invoice {
       finalCalc: FinalCalculation.fromJson(Site.fromJson(List<Map<String, dynamic>>.from(json['siteData'])), json['gstPercent'] as int, json['pendingAmount'] as double),
       notes: ['This is a sample note', 'This is another sample note'],
       pendingInvoices: [],
+      billdetails: json['billdetails'],
       // totalcaculationtable: TotalcaculationTable.fromJson(json['totalcaculationtable']),
     );
   }
@@ -332,7 +335,7 @@ class Invoice {
       'siteData': Site.toJsonList(siteData),
       'finalCalc': finalCalc.toJson(),
       'addressDetails': addressDetails.toJson(),
-      'notes': notes.map((e) => e.trim()).toList(),
+      'notes': notes.map((e) => e.trim()).toList(), "billdetails": billdetails,
       // 'totalcaculationtable': totalcaculationtable,
     };
   }
@@ -433,6 +436,38 @@ class FinalCalculation {
   }
 }
 
+class GST {
+  double IGST;
+  double CGST;
+  double SGST;
+
+  GST({required this.IGST, required this.CGST, required this.SGST});
+
+  factory GST.fromJson(Map<String, dynamic> json) {
+    return GST(IGST: json['IGST'] ?? 0.0, CGST: json['CGST'] ?? 0.0, SGST: json['SGST'] ?? 0.0);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'IGST': IGST, 'CGST': CGST, 'SGST': SGST};
+  }
+}
+
+class BillDetails {
+  double total;
+  double subtotal;
+  GST gst;
+
+  BillDetails({required this.total, required this.subtotal, required this.gst});
+
+  factory BillDetails.fromJson(Map<String, dynamic> json) {
+    return BillDetails(total: json['total'] ?? 0.0, subtotal: json['subtotal'] ?? 0.0, gst: GST.fromJson(json['gst'] ?? {}));
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'total': total, 'subtotal': subtotal, 'gst': gst.toJson()};
+  }
+}
+
 class PostData {
   List<int> siteIds;
   List<String> siteNames;
@@ -457,6 +492,8 @@ class PostData {
   String dueDate;
   String amountpaid;
   String pendingpayments;
+  String gstNumber;
+  Map<String, dynamic> billdetails;
 
   PostData({
     required this.siteIds,
@@ -482,6 +519,8 @@ class PostData {
     required this.dueDate,
     required this.amountpaid,
     required this.pendingpayments,
+    required this.gstNumber,
+    required this.billdetails,
   });
 
   factory PostData.fromJson(Invoice data) {
@@ -516,6 +555,8 @@ class PostData {
       dueDate: data.billPlanDetails.dueDate.trim(),
       amountpaid: data.billPlanDetails.amountPaid.trim(),
       pendingpayments: data.billPlanDetails.pendingPayments.trim(),
+      gstNumber: data.customerAccountDetails.customerGSTIN.trim(),
+      billdetails: data.billdetails,
     );
   }
 
@@ -544,6 +585,8 @@ class PostData {
       "duedate": dueDate,
       "amountpaid": amountpaid,
       "pendingpayments": pendingpayments,
+      "gstnumber": gstNumber,
+      "billdetails": billdetails,
     };
   }
 }

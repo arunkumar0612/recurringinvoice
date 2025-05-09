@@ -777,7 +777,10 @@ class InvoiceTemplate {
                   children: [
                     pw.Expanded(
                       child: pw.Center(
-                        child: pw.Padding(padding: const pw.EdgeInsets.all(5.0), child: pw.Text('Previous dues', style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: _darkColor))),
+                        child: pw.Padding(
+                          padding: const pw.EdgeInsets.all(5.0),
+                          child: pw.Text('Previous dues', style: pw.TextStyle(fontSize: 10, font: Helvetica_bold, fontWeight: pw.FontWeight.bold, color: _darkColor)),
+                        ),
                       ),
                     ),
                     pw.Container(height: 0.5, color: _darkColor),
@@ -788,8 +791,9 @@ class InvoiceTemplate {
                           height: 25,
                           child: pw.Text(
                             instInvoice.billPlanDetails.pendingPayments,
-                            style: const pw.TextStyle(
+                            style: pw.TextStyle(
                               fontSize: 10,
+                              font: Helvetica,
                               // fontWeight: pw.FontWeight.bold,
                               color: _darkColor,
                             ),
@@ -804,7 +808,7 @@ class InvoiceTemplate {
           ),
         // ignore: prefer_const_constructors
         if (instInvoice.billPlanDetails.showPending == 0)
-          pw.Padding(padding: const pw.EdgeInsets.all(8.0), child: pw.Text('-', style: pw.TextStyle(color: _darkColor, fontSize: 10, fontWeight: pw.FontWeight.bold))),
+          pw.Padding(padding: const pw.EdgeInsets.all(8.0), child: pw.Text('-', style: pw.TextStyle(color: _darkColor, font: Helvetica_bold, fontSize: 10, fontWeight: pw.FontWeight.bold))),
         if (instInvoice.billPlanDetails.showPending == 0)
           pw.Expanded(
             child: pw.Container(
@@ -817,7 +821,10 @@ class InvoiceTemplate {
                   children: [
                     pw.Expanded(
                       child: pw.Center(
-                        child: pw.Padding(padding: const pw.EdgeInsets.all(5.0), child: pw.Text('Payments', style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: _darkColor))),
+                        child: pw.Padding(
+                          padding: const pw.EdgeInsets.all(5.0),
+                          child: pw.Text('Payments', style: pw.TextStyle(fontSize: 10, font: Helvetica_bold, fontWeight: pw.FontWeight.bold, color: _darkColor)),
+                        ),
                       ),
                     ),
                     pw.Container(height: 0.5, color: _darkColor),
@@ -826,7 +833,8 @@ class InvoiceTemplate {
                         padding: const pw.EdgeInsets.all(8.0),
                         child: pw.Text(
                           instInvoice.billPlanDetails.amountPaid,
-                          style: const pw.TextStyle(
+                          style: pw.TextStyle(
+                            font: Helvetica,
                             fontSize: 10,
                             // fontWeight: pw.FontWeight.bold,
                             color: _darkColor,
@@ -841,7 +849,7 @@ class InvoiceTemplate {
           ),
         // ignore: prefer_const_constructors
         if (instInvoice.billPlanDetails.showPending == 0)
-          pw.Padding(padding: const pw.EdgeInsets.all(8.0), child: pw.Text('+', style: pw.TextStyle(color: _darkColor, fontSize: 10, fontWeight: pw.FontWeight.bold))),
+          pw.Padding(padding: const pw.EdgeInsets.all(8.0), child: pw.Text('+', style: pw.TextStyle(color: _darkColor, fontSize: 10, font: Helvetica_bold, fontWeight: pw.FontWeight.bold))),
         if (instInvoice.billPlanDetails.showPending == 0)
           pw.Expanded(
             child: pw.Container(
@@ -855,7 +863,11 @@ class InvoiceTemplate {
                     pw.Expanded(
                       child: pw.Padding(
                         padding: const pw.EdgeInsets.all(5),
-                        child: pw.Text(textAlign: pw.TextAlign.center, 'Adjustments/ Deductions', style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: _darkColor)),
+                        child: pw.Text(
+                          textAlign: pw.TextAlign.center,
+                          'Adjustments/ Deductions',
+                          style: pw.TextStyle(fontSize: 10, font: Helvetica_bold, fontWeight: pw.FontWeight.bold, color: _darkColor),
+                        ),
                       ),
                     ),
                     pw.Container(height: 0.5, color: _darkColor),
@@ -864,7 +876,8 @@ class InvoiceTemplate {
                         padding: const pw.EdgeInsets.all(8.0),
                         child: pw.Text(
                           instInvoice.billPlanDetails.tdsDeductions,
-                          style: const pw.TextStyle(
+                          style: pw.TextStyle(
+                            font: Helvetica,
                             fontSize: 10,
                             // fontWeight: pw.FontWeight.bold,
                             color: _darkColor,
@@ -879,7 +892,7 @@ class InvoiceTemplate {
           ),
         // ignore: prefer_const_constructors
         if (instInvoice.billPlanDetails.showPending == 0)
-          pw.Padding(padding: const pw.EdgeInsets.all(8.0), child: pw.Text('+', style: pw.TextStyle(color: _darkColor, fontSize: 10, fontWeight: pw.FontWeight.bold))),
+          pw.Padding(padding: const pw.EdgeInsets.all(8.0), child: pw.Text('+', style: pw.TextStyle(color: _darkColor, fontSize: 10, font: Helvetica_bold, fontWeight: pw.FontWeight.bold))),
 
         pw.Expanded(
           child: pw.Container(
@@ -895,7 +908,9 @@ class InvoiceTemplate {
                   pw.Expanded(
                     child: pw.Padding(
                       padding: const pw.EdgeInsets.all(5.0),
-                      child: pw.Align(child: pw.Text(textAlign: pw.TextAlign.center, 'Current Charges', style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: _darkColor))),
+                      child: pw.Align(
+                        child: pw.Text(textAlign: pw.TextAlign.center, 'Current Charges', style: pw.TextStyle(fontSize: 10, font: Helvetica_bold, fontWeight: pw.FontWeight.bold, color: _darkColor)),
+                      ),
                     ),
                   ),
                   pw.Container(height: 0.5, color: _darkColor),
@@ -908,7 +923,7 @@ class InvoiceTemplate {
                           textAlign: pw.TextAlign.center,
                           // '156745765476456000',
                           formatCurrencyRoundedPaisa(instInvoice.finalCalc.total),
-                          style: pw.TextStyle(fontSize: 10, color: _darkColor, height: 2.3, fontWeight: pw.FontWeight.bold),
+                          style: pw.TextStyle(fontSize: 10, color: _darkColor, height: 2.3, font: Helvetica_bold, fontWeight: pw.FontWeight.bold),
                         ),
                       ),
                     ),
@@ -919,7 +934,7 @@ class InvoiceTemplate {
           ),
         ),
         // ignore: prefer_const_constructors
-        pw.Padding(padding: const pw.EdgeInsets.all(8.0), child: pw.Text('=', style: pw.TextStyle(color: _darkColor, fontSize: 10, fontWeight: pw.FontWeight.bold))),
+        pw.Padding(padding: const pw.EdgeInsets.all(8.0), child: pw.Text('=', style: pw.TextStyle(color: _darkColor, fontSize: 10, font: Helvetica_bold, fontWeight: pw.FontWeight.bold))),
         pw.Expanded(
           flex: instInvoice.billPlanDetails.showPending == 0 ? 2 : 1,
           // flex: instInvoice.billPlanDetails.showPending==0 ? 2 : 1,
@@ -939,7 +954,13 @@ class InvoiceTemplate {
                       crossAxisAlignment: pw.CrossAxisAlignment.center,
                       children: [
                         pw.Expanded(
-                          child: pw.Center(child: pw.Text(textAlign: pw.TextAlign.center, 'Total amount Due', style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: _darkColor))),
+                          child: pw.Center(
+                            child: pw.Text(
+                              textAlign: pw.TextAlign.center,
+                              'Total amount Due',
+                              style: pw.TextStyle(fontSize: 10, font: Helvetica_bold, fontWeight: pw.FontWeight.bold, color: _darkColor),
+                            ),
+                          ),
                         ),
                         pw.Container(height: 0.5, color: _darkColor),
                         pw.Expanded(
@@ -951,7 +972,7 @@ class InvoiceTemplate {
                                 textAlign: pw.TextAlign.center,
                                 formatCurrencyRoundedPaisa(totalDue),
                                 // '156745765476456000',
-                                style: pw.TextStyle(fontSize: 10, color: _darkColor, height: 2.3, fontWeight: pw.FontWeight.bold),
+                                style: pw.TextStyle(fontSize: 10, color: _darkColor, height: 2.3, font: Helvetica_bold, fontWeight: pw.FontWeight.bold),
                               ),
                             ),
                           ),
@@ -972,7 +993,7 @@ class InvoiceTemplate {
                     padding: const pw.EdgeInsets.all(0),
                     child: pw.Column(
                       children: [
-                        pw.Expanded(child: pw.Center(child: pw.Text('Due date', style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: _darkColor)))),
+                        pw.Expanded(child: pw.Center(child: pw.Text('Due date', style: pw.TextStyle(fontSize: 10, font: Helvetica_bold, fontWeight: pw.FontWeight.bold, color: _darkColor)))),
                         pw.Container(height: 0.5, color: _darkColor),
                         pw.Expanded(
                           child: pw.Padding(
@@ -983,7 +1004,7 @@ class InvoiceTemplate {
                                 textAlign: pw.TextAlign.center,
                                 instInvoice.billPlanDetails.dueDate,
                                 // '156745765476456000',
-                                style: pw.TextStyle(fontSize: 10, color: _darkColor, height: 2.3, fontWeight: pw.FontWeight.bold),
+                                style: pw.TextStyle(fontSize: 10, color: _darkColor, height: 2.3, font: Helvetica_bold, fontWeight: pw.FontWeight.bold),
                               ),
                             ),
                           ),
@@ -1196,10 +1217,11 @@ class InvoiceTemplate {
                         height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
                         decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(width: 0.5))),
                         child: pw.Padding(
-                          padding: const pw.EdgeInsets.only(left: 10),
+                          padding: const pw.EdgeInsets.only(right: 5),
                           child: pw.Row(
-                            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                            // mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                             children: [
+                              pw.Spacer(),
                               bold(formatzero(instInvoice.finalCalc.subtotal), 10),
                               // regular(formatzero(instInvoice.finalCalc.subtotal), 10),
                             ],
@@ -1220,8 +1242,16 @@ class InvoiceTemplate {
                         height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
                         decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(width: 0.5))),
                         child: pw.Padding(
-                          padding: const pw.EdgeInsets.only(left: 10),
-                          child: pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [bold(formatzero(instInvoice.finalCalc.subtotal), 10)]),
+                          padding: const pw.EdgeInsets.only(right: 5),
+                          child: pw.Align(
+                            alignment: pw.Alignment.centerRight,
+                            child: pw.Row(
+                              children: [
+                                pw.Spacer(), // pushes the following widget to the right
+                                bold(formatzero(instInvoice.finalCalc.subtotal), 10),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                       pw.Container(
@@ -1248,10 +1278,11 @@ class InvoiceTemplate {
                         height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
                         decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(width: 0.5))),
                         child: pw.Padding(
-                          padding: const pw.EdgeInsets.only(left: 10),
+                          padding: const pw.EdgeInsets.only(right: 5),
                           child: pw.Row(
-                            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                            // mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                             children: [
+                              pw.Spacer(),
                               isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? bold(formatzero(instInvoice.finalCalc.cgst), 10) : bold(formatzero(instInvoice.finalCalc.igst), 10),
                               // regular(formatzero(instInvoice.finalCalc.subtotal), 10),
                             ],
@@ -1263,24 +1294,33 @@ class InvoiceTemplate {
                           height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
                           decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(width: 0.5))),
                           child: pw.Padding(
-                            padding: const pw.EdgeInsets.only(left: 10),
-                            child: pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [bold(formatzero(instInvoice.finalCalc.sgst), 10)]),
+                            padding: const pw.EdgeInsets.only(right: 5),
+                            child: pw.Row(
+                              // mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                              children: [pw.Spacer(), bold(formatzero(instInvoice.finalCalc.sgst), 10)],
+                            ),
                           ),
                         ),
                       pw.Container(
                         height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
                         decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(width: 0.5))),
                         child: pw.Padding(
-                          padding: const pw.EdgeInsets.only(left: 10),
-                          child: pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [bold(instInvoice.finalCalc.differene, 10)]),
+                          padding: const pw.EdgeInsets.only(right: 5),
+                          child: pw.Row(
+                            // mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                            children: [pw.Spacer(), bold(instInvoice.finalCalc.differene, 10)],
+                          ),
                         ),
                       ),
                       pw.Container(
                         height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
                         // decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide())),
                         child: pw.Padding(
-                          padding: const pw.EdgeInsets.only(left: 10),
-                          child: pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [bold(formatzero(instInvoice.finalCalc.total), 10)]),
+                          padding: const pw.EdgeInsets.only(right: 5),
+                          child: pw.Row(
+                            // mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                            children: [pw.Spacer(), bold(formatzero(instInvoice.finalCalc.total), 10)],
+                          ),
                         ),
                       ),
                     ],

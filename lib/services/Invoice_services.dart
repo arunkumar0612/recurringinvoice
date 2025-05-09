@@ -72,9 +72,10 @@ class InvoiceServices {
     int gstPercent = jsonData["gstPercent"];
     double? pendingAmount = jsonData["pendingAmount"] != null ? (jsonData["pendingAmount"] as num).toDouble() : null;
     FinalCalculation finalCalc = FinalCalculation.fromJson(sites, gstPercent, pendingAmount);
+    var bill = BillDetails(total: finalCalc.total, subtotal: finalCalc.subtotal, gst: GST(IGST: finalCalc.igst, CGST: finalCalc.cgst, SGST: finalCalc.sgst));
     return Invoice(
-      date: jsonData["date"],
-      invoiceNo: jsonData["invoiceNo"],
+      date: jsonData["date"].trim(),
+      invoiceNo: jsonData["invoiceNo"].trim(),
       gstPercent: jsonData['gstPercent'],
       pendingAmount: pendingAmount,
       addressDetails: address,
@@ -85,6 +86,7 @@ class InvoiceServices {
       finalCalc: finalCalc,
       notes: ['This is a system generated invoice hence do not require signature.', 'Please make the payment on or before the due date.'],
       pendingInvoices: pendingInvoice,
+      billdetails: bill.toJson(),
       // totalcaculationtable: TotalcaculationTable(previousdues: "15000", payment: "34343", adjustments_deduction: "32", currentcharges: "34", totalamountdue: "34343"),
     );
   }
@@ -113,7 +115,7 @@ class InvoiceServices {
     try {
       Map<String, dynamic>? response = await apiController.Multer(jsonData, GeneratedInvoices, "http://192.168.0.200:8081/subscription/addrecurringinvoice");
       if (response['statusCode'] == 200) {
-        // print(response['data']);
+        print(response['data']);
         // CMDmResponse value = CMDmResponse.fromJson(response);
         // if (value.code) {
         //   await Basic_dialog(context: context, title: "Invoice", content: value.message!, onOk: () {}, showCancel: false);
