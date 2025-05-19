@@ -456,15 +456,16 @@ class BillDetails {
   double total;
   double subtotal;
   GST gst;
+  double tdsamount;
 
-  BillDetails({required this.total, required this.subtotal, required this.gst});
+  BillDetails({required this.total, required this.subtotal, required this.gst, required this.tdsamount});
 
   factory BillDetails.fromJson(Map<String, dynamic> json) {
-    return BillDetails(total: json['total'] ?? 0.0, subtotal: json['subtotal'] ?? 0.0, gst: GST.fromJson(json['gst'] ?? {}));
+    return BillDetails(total: json['total'] ?? 0.0, subtotal: json['subtotal'] ?? 0.0, gst: GST.fromJson(json['gst'] ?? {}), tdsamount: json['tdsamount'] ?? 0.0);
   }
 
   Map<String, dynamic> toJson() {
-    return {'total': total, 'subtotal': subtotal, 'gst': gst.toJson()};
+    return {'total': total, 'subtotal': subtotal, 'gst': gst.toJson(), 'tdsamount': tdsamount};
   }
 }
 

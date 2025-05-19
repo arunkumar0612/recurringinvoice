@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:get/get.dart';
 import 'package:recurring_invoice/models/entities/Invoice_entities.dart';
 import 'package:recurring_invoice/services/APIservices/invoker.dart';
+import 'package:recurring_invoice/utils/helpers/support_functions.dart';
 
 class InvoiceServices {
   static final Invoker apiController = Get.find<Invoker>();
@@ -72,7 +73,16 @@ class InvoiceServices {
     int gstPercent = jsonData["gstPercent"];
     double? pendingAmount = jsonData["pendingAmount"] != null ? (jsonData["pendingAmount"] as num).toDouble() : null;
     FinalCalculation finalCalc = FinalCalculation.fromJson(sites, gstPercent, pendingAmount);
-    var bill = BillDetails(total: finalCalc.total, subtotal: finalCalc.subtotal, gst: GST(IGST: finalCalc.igst, CGST: finalCalc.cgst, SGST: finalCalc.sgst));
+    var bill = BillDetails(
+      total: finalCalc.total,
+      subtotal: finalCalc.subtotal,
+      tdsamount: 0.0, //while genrating a invoice we  cannot know, that client will deduct tds or not
+      gst: GST(
+        IGST: isGST_Local(customerAccount.customerGSTIN) ? 0.0 : finalCalc.igst,
+        CGST: isGST_Local(customerAccount.customerGSTIN) ? finalCalc.cgst : 0.0,
+        SGST: isGST_Local(customerAccount.customerGSTIN) ? finalCalc.sgst : 0.0,
+      ),
+    );
     return Invoice(
       date: jsonData["date"].trim(),
       invoiceNo: jsonData["invoiceNo"].trim(),
