@@ -56,7 +56,7 @@ class InvoiceServices {
       consolidate_email: jsonData["customeraccountdetails"]["consolidate_email"],
       customerID: jsonData["customeraccountdetails"]["customerid"],
       relationshipId: jsonData["customeraccountdetails"]["relationshipid"],
-      billNumber: jsonData["customeraccountdetails"]["billnumber"],
+      // billNumber: jsonData["customeraccountdetails"]["billnumber"],
       customerGSTIN: jsonData["customeraccountdetails"]["customergstin"],
       hsnSacCode: jsonData["customeraccountdetails"]["hsncode"].toString(),
       customerPO: jsonData["customeraccountdetails"]["customerpo"],
@@ -78,9 +78,9 @@ class InvoiceServices {
       subtotal: finalCalc.subtotal,
       tdsamount: 0.0, //while genrating a invoice we  cannot know, that client will deduct tds or not
       gst: GST(
-        IGST: isGST_Local(customerAccount.customerGSTIN) ? 0.0 : finalCalc.igst,
-        CGST: isGST_Local(customerAccount.customerGSTIN) ? finalCalc.cgst : 0.0,
-        SGST: isGST_Local(customerAccount.customerGSTIN) ? finalCalc.sgst : 0.0,
+        IGST: isGST_Local(customerAccount.customerGSTIN, address.billingAddress) ? 0.0 : finalCalc.igst,
+        CGST: isGST_Local(customerAccount.customerGSTIN, address.billingAddress) ? finalCalc.cgst : 0.0,
+        SGST: isGST_Local(customerAccount.customerGSTIN, address.billingAddress) ? finalCalc.sgst : 0.0,
       ),
     );
     return Invoice(

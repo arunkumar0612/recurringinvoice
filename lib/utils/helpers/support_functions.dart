@@ -126,13 +126,27 @@ String generateRandomString(int length) {
   return List.generate(length, (index) => chars[random.nextInt(chars.length)]).join('');
 }
 
-bool isGST_Local(String gstNumber) {
-  // Check if the GST number is valid and has at least 2 characters
-  if (gstNumber.length < 2) return false;
+bool isGST_Local(String? gstNumber, String address) {
+  // Check GST number validity and state code
+  if (gstNumber != null && gstNumber.length >= 2) {
+    String stateCode = gstNumber.substring(0, 2);
+    return stateCode == '33';
+  }
 
-  // Extract the first two digits (state code)
-  String stateCode = gstNumber.substring(0, 2);
+  // If GST is null, fall back to address
+  String lowerAddress = address.toLowerCase();
 
-  // Return true if Tamil Nadu (33), else false
-  return stateCode == '33';
+  // Check for keywords like 'tamilnadu' or 'tamil nadu'
+  if (lowerAddress.contains('tamilnadu') || lowerAddress.contains('tamil nadu')) {
+    return true;
+  }
+
+  // Tamil Nadu PIN codes start from 600000 to 649999
+  final pinCodeRegex = RegExp(r'\b(60|61|62|63|64|65)\d{4}\b');
+  if (pinCodeRegex.hasMatch(lowerAddress)) {
+    return true;
+  }
+
+  // Default to false if no conditions met
+  return false;
 }

@@ -67,7 +67,7 @@ class Site {
       case 2:
         return branchCode;
       case 3:
-        return monthlyCharges;
+        return formatCurrency(monthlyCharges);
       default:
         return "";
     }
@@ -220,10 +220,10 @@ class CustomerAccountDetails {
   final String consolidate_email;
   final int customerID;
   final String relationshipId;
-  final String billNumber;
+  // final String billNumber;
   final String customerGSTIN;
   final String hsnSacCode;
-  final String customerPO;
+  final String? customerPO;
   final String contactPerson;
   final String contactNumber;
 
@@ -231,7 +231,7 @@ class CustomerAccountDetails {
     required this.consolidate_email,
     required this.customerID,
     required this.relationshipId,
-    required this.billNumber,
+    // required this.billNumber,
     required this.customerGSTIN,
     required this.hsnSacCode,
     required this.customerPO,
@@ -245,10 +245,10 @@ class CustomerAccountDetails {
       consolidate_email: (json['consolidate_email'] as String).trim(),
       customerID: json['customerid'] as int,
       relationshipId: (json['relationshipId'] as String).trim(),
-      billNumber: (json['billNumber'] as String).trim(),
-      customerGSTIN: (json['customerGSTIN'] as String).trim(),
+      // billNumber: (json['billNumber'] as String).trim(),
+      customerGSTIN: (json['customerGSIN'] ?? '-').trim(),
       hsnSacCode: (json['hsnSacCode'] as String).trim(),
-      customerPO: (json['customerPO'] as String).trim(),
+      customerPO: (json['customerPO']),
       contactPerson: (json['contactPerson'] as String).trim(),
       contactNumber: (json['contactNumber'] as String).trim(),
     );
@@ -260,7 +260,7 @@ class CustomerAccountDetails {
       'consolidate_email': consolidate_email,
       'customerid': customerID,
       'relationshipId': relationshipId,
-      'billNumber': billNumber,
+      // 'billNumber': billNumber,
       'customerGSTIN': customerGSTIN,
       'hsnSacCode': hsnSacCode,
       'customerPO': customerPO,

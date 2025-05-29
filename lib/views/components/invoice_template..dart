@@ -43,38 +43,9 @@ class InvoiceTemplate {
         footer: (context) => footer(context),
         build:
             (context) => [
-              // pw.Container(child: to_addr(context)),
-              // pw.SizedBox(height: 10),
-              // pw.Padding(
-              //   padding: const pw.EdgeInsets.only(
-              //     left: 20,
-              //     right: 20,
-              //   ),
-              //   child: pw.Container(
-              //     color: baseColor,
-              //     height: 20,
-              //     child: pw.Center(
-              //       child: pw.Text('Your e - Surveillance bill', style: pw.TextStyle(fontSize: 12, color: PdfColors.white, fontWeight: pw.FontWeight.bold)),
-              //     ),
-              //   ),
-              // ),
               pw.SizedBox(height: 15),
               pw.Padding(padding: const pw.EdgeInsets.only(left: 20, right: 20), child: pw.Container(child: to_addr(context))),
               pw.SizedBox(height: 10),
-              // pw.Padding(
-              //   padding: const pw.EdgeInsets.only(
-              //     left: 20,
-              //     right: 20,
-              //   ),
-              //   child: pw.Container(
-              //     color: baseColor,
-              //     height: 20,
-              //     child: pw.Center(
-              //       child: pw.Text('Account Summary', style: pw.TextStyle(fontSize: 12, color: PdfColors.white, fontWeight: pw.FontWeight.bold)),
-              //     ),
-              //   ),
-              // ),
-              // pw.SizedBox(height: 5),
               pw.Padding(padding: const pw.EdgeInsets.only(left: 20, right: 20), child: pw.Container(child: account_details(context))),
               pw.SizedBox(height: 15),
               pw.Padding(padding: const pw.EdgeInsets.only(left: 20, right: 20), child: TotalcaculationTable()),
@@ -109,8 +80,9 @@ class InvoiceTemplate {
               pw.SizedBox(height: 15),
               pw.Center(child: regular('*** This is a system generated invoice hence do not require signature. ***', 10)),
 
-              if (instInvoice.siteData.length > 1) pw.Padding(padding: const pw.EdgeInsets.only(left: 20, right: 20, top: 10), child: contentTable(context)),
-              // pw.Divider(height: 1, color: baseColor),
+              if (instInvoice.siteData.length > 1) ...[
+                pw.Padding(padding: const pw.EdgeInsets.only(left: 20, right: 20, top: 10), child: pw.Column(children: contentTableSafe(context))),
+              ], // pw.Divider(height: 1, color: baseColor),
               // pw.Padding(
               //   padding: const pw.EdgeInsets.all(5),
               //   child: pw.Align(
@@ -134,7 +106,7 @@ class InvoiceTemplate {
           children: [
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: pw.CrossAxisAlignment.end,
+              crossAxisAlignment: pw.CrossAxisAlignment.center,
               children: [
                 pw.Container(padding: const pw.EdgeInsets.only(bottom: 0, left: 2), height: 90, child: pw.Image(profileImage)),
                 pw.Text(
@@ -151,17 +123,17 @@ class InvoiceTemplate {
                   child: pw.Row(
                     children: [
                       pw.Column(
-                        mainAxisAlignment: pw.MainAxisAlignment.end,
+                        mainAxisAlignment: pw.MainAxisAlignment.center,
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [regular('Date', 10), pw.SizedBox(height: 5), regular('Invoice no', 10)],
                       ),
                       pw.Column(
-                        mainAxisAlignment: pw.MainAxisAlignment.end,
+                        mainAxisAlignment: pw.MainAxisAlignment.center,
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [regular('  :  ', 10), pw.SizedBox(height: 5), regular('  :  ', 10)],
                       ),
                       pw.Column(
-                        mainAxisAlignment: pw.MainAxisAlignment.end,
+                        mainAxisAlignment: pw.MainAxisAlignment.center,
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
                           pw.Container(
@@ -172,7 +144,7 @@ class InvoiceTemplate {
                             ),
                           ),
                           pw.SizedBox(height: 5),
-                          pw.Container(child: pw.Align(alignment: pw.Alignment.centerLeft, child: regular(instInvoice.invoiceNo, 10))),
+                          pw.Container(child: pw.Align(alignment: pw.Alignment.centerLeft, child: bold(instInvoice.invoiceNo, 10))),
                         ],
                       ),
                     ],
@@ -550,7 +522,7 @@ class InvoiceTemplate {
                         padding: const pw.EdgeInsets.symmetric(horizontal: 0),
                         child: pw.Text(
                           // 'AAAAAAAAAAAAAAA',
-                          instInvoice.customerAccountDetails.customerPO,
+                          instInvoice.customerAccountDetails.customerPO ?? '-',
                           textAlign: pw.TextAlign.start,
                           style: pw.TextStyle(font: Helvetica, fontSize: 10, lineSpacing: 2, color: _darkColor),
                           softWrap: true, // Ensure text wraps within the container
@@ -676,89 +648,103 @@ class InvoiceTemplate {
   //   return pw.Center(child: bold("GSTIN : $GST", 12));
   // }
 
-  pw.Widget contentTable(pw.Context context) {
+  List<pw.Widget> contentTableSafe(pw.Context context) {
     const tableHeaders = ['S.No', 'SITE NAME & ADDRESS', 'CUSTOMER ID', 'MONTHLY CHARGES'];
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        // Main table with full border
-        pw.Table(
-          border: pw.TableBorder.all(color: _darkColor, width: 1),
-          columnWidths: {0: const pw.FlexColumnWidth(1), 1: const pw.FlexColumnWidth(5), 2: const pw.FlexColumnWidth(2), 3: const pw.FlexColumnWidth(2)},
+
+    List<pw.Widget> rows = [];
+
+    // Add table header
+    rows.add(
+      pw.Container(
+        decoration: const pw.BoxDecoration(color: baseColor),
+        child: pw.Row(
           children: [
-            pw.TableRow(
-              verticalAlignment: pw.TableCellVerticalAlignment.middle,
-              decoration: const pw.BoxDecoration(color: baseColor),
-              children:
-                  tableHeaders.map((header) {
-                    return pw.Container(
-                      padding: const pw.EdgeInsets.all(5),
-                      alignment: pw.Alignment.centerLeft,
-                      child: pw.Text(header, style: pw.TextStyle(font: Helvetica_bold, color: PdfColors.white, fontSize: 10, fontWeight: pw.FontWeight.bold)),
-                    );
-                  }).toList(),
-            ),
-            ...List.generate(instInvoice.siteData.length, (row) {
-              return pw.TableRow(
-                verticalAlignment: pw.TableCellVerticalAlignment.middle,
-                decoration: const pw.BoxDecoration(color: PdfColors.white),
-                children: List.generate(tableHeaders.length, (col) {
-                  final content = instInvoice.siteData[row].getIndex(col);
-                  return pw.Container(
-                    height: 40,
-                    padding: const pw.EdgeInsets.all(5),
-                    alignment: _getAlignment(col),
-                    child:
-                        col == 1 && content is String && content.contains('||')
-                            ? _buildRichSiteText(content)
-                            : pw.Text(content.toString(), style: pw.TextStyle(font: Helvetica, color: _darkColor, fontSize: 10)),
-                  );
-                }),
+            pw.Expanded(flex: 1, child: headerCell(tableHeaders[0])),
+            pw.Expanded(flex: 5, child: headerCell(tableHeaders[1])),
+            pw.Expanded(flex: 2, child: headerCell(tableHeaders[2])),
+            pw.Expanded(flex: 2, child: headerCell(tableHeaders[3])),
+          ],
+        ),
+      ),
+    );
+
+    // Add each data row
+    for (int row = 0; row < instInvoice.siteData.length; row++) {
+      rows.add(
+        pw.Container(
+          decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(color: PdfColors.black, width: 0.5))),
+          child: pw.Row(
+            children: List.generate(tableHeaders.length, (col) {
+              final content = instInvoice.siteData[row].getIndex(col);
+              return pw.Expanded(
+                flex: _getFlex(col),
+                child: pw.Container(
+                  padding: const pw.EdgeInsets.all(5),
+                  alignment: _getAlignment(col),
+                  child: col == 1 && content is String && content.contains('||') ? _buildRichSiteText(content) : pw.Text(content.toString(), style: pw.TextStyle(font: Helvetica, fontSize: 10)),
+                ),
               );
             }),
-          ],
+          ),
         ),
+      );
+    }
 
-        // Final row aligned with last two columns
-        pw.Row(
-          children: [
-            pw.Expanded(flex: 6, child: pw.Container()), // Spacer to align
-            pw.Expanded(
-              flex: 2,
-              child: pw.Container(
-                height: 40,
-                padding: const pw.EdgeInsets.all(5),
-                decoration: const pw.BoxDecoration(
-                  border: pw.Border(
-                    left: pw.BorderSide(color: PdfColors.black, width: 1),
-                    right: pw.BorderSide(color: PdfColors.black, width: 1),
-                    bottom: pw.BorderSide(color: PdfColors.black, width: 1),
-                  ),
-                ),
-                alignment: _getAlignment(2),
-                child: pw.Text('TOTAL', style: pw.TextStyle(font: Helvetica_bold, color: _darkColor, fontSize: 10)),
-              ),
+    // Add final total row
+    rows.add(
+      pw.Row(
+        children: [
+          pw.Expanded(flex: 6, child: pw.Container()), // Spacer
+          pw.Expanded(
+            flex: 2,
+            child: pw.Container(
+              padding: const pw.EdgeInsets.only(left: 5, right: 5, top: 10),
+              // decoration: const pw.BoxDecoration(
+              //   border: pw.Border(
+              //     left: pw.BorderSide(color: PdfColors.black, width: 1),
+              //     right: pw.BorderSide(color: PdfColors.black, width: 1),
+              //     bottom: pw.BorderSide(color: PdfColors.black, width: 1),
+              //   ),
+              // ),
+              alignment: _getAlignment(2),
+              child: pw.Text('TOTAL', style: pw.TextStyle(font: Helvetica_bold, fontSize: 12)),
             ),
-            pw.Expanded(
-              flex: 2,
-              child: pw.Container(
-                height: 40,
-                padding: const pw.EdgeInsets.all(5),
-                decoration: const pw.BoxDecoration(
-                  border: pw.Border(
-                    // left: pw.BorderSide(color: PdfColors.black, width: 1),
-                    right: pw.BorderSide(color: PdfColors.black, width: 1),
-                    bottom: pw.BorderSide(color: PdfColors.black, width: 1),
-                  ),
-                ),
-                alignment: _getAlignment(3),
-                child: pw.Text(formatzero(instInvoice.finalCalc.subtotal), style: pw.TextStyle(font: Helvetica_bold, color: _darkColor, fontSize: 10)),
-              ),
+          ),
+          pw.Expanded(
+            flex: 2,
+            child: pw.Container(
+              padding: const pw.EdgeInsets.only(
+                left: 5,
+                right: 5,
+                top: 10,
+              ), // decoration: const pw.BoxDecoration(border: pw.Border(right: pw.BorderSide(color: PdfColors.black, width: 1), bottom: pw.BorderSide(color: PdfColors.black, width: 1))),
+              alignment: _getAlignment(3),
+              child: pw.Text(formatzero(instInvoice.finalCalc.subtotal), style: pw.TextStyle(font: Helvetica_bold, fontSize: 12)),
             ),
-          ],
-        ),
-      ],
+          ),
+        ],
+      ),
     );
+
+    return rows;
+  }
+
+  pw.Widget headerCell(String text) {
+    return pw.Container(padding: const pw.EdgeInsets.all(5), alignment: pw.Alignment.centerLeft, child: pw.Text(text, style: pw.TextStyle(font: Helvetica_bold, color: PdfColors.white, fontSize: 10)));
+  }
+
+  int _getFlex(int col) {
+    switch (col) {
+      case 0:
+        return 1;
+      case 1:
+        return 5;
+      case 2:
+      case 3:
+        return 2;
+      default:
+        return 1;
+    }
   }
 
   pw.Widget TotalcaculationTable() {
@@ -955,11 +941,7 @@ class InvoiceTemplate {
                       children: [
                         pw.Expanded(
                           child: pw.Center(
-                            child: pw.Text(
-                              textAlign: pw.TextAlign.center,
-                              'Total amount Due',
-                              style: pw.TextStyle(fontSize: 10, font: Helvetica_bold, fontWeight: pw.FontWeight.bold, color: _darkColor),
-                            ),
+                            child: pw.Text(textAlign: pw.TextAlign.center, 'Total amount', style: pw.TextStyle(fontSize: 10, font: Helvetica_bold, fontWeight: pw.FontWeight.bold, color: _darkColor)),
                           ),
                         ),
                         pw.Container(height: 0.5, color: _darkColor),
@@ -1040,7 +1022,7 @@ class InvoiceTemplate {
           // padding: const pw.EdgeInsets.only(bottom: 0, left: 0),
           // height: 200,
           // width: 180,
-          child: pw.SizedBox(height: 190, child: pw.Image(secureshutterImage, fit: pw.BoxFit.cover)),
+          child: pw.SizedBox(height: 190, child: pw.Image(secureshutterImage, fit: pw.BoxFit.fill)),
         ),
       ],
     );
@@ -1062,7 +1044,7 @@ class InvoiceTemplate {
                   mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
                   children: [
                     pw.Container(
-                      height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
+                      height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress) ? 18 : 20,
                       color: baseColor,
                       child: pw.Row(
                         crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -1082,7 +1064,7 @@ class InvoiceTemplate {
                       ),
                     ),
                     pw.Container(
-                      height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
+                      height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress) ? 18 : 20,
                       decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(width: 0.5))),
                       child: pw.Padding(
                         padding: const pw.EdgeInsets.only(left: 10),
@@ -1096,17 +1078,17 @@ class InvoiceTemplate {
                       ),
                     ),
                     pw.Container(
-                      height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
+                      height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress) ? 18 : 20,
                       decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(width: 0.5))),
                       child: pw.Padding(padding: const pw.EdgeInsets.only(left: 10), child: pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [bold('', 10)])),
                     ),
                     pw.Container(
-                      height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
+                      height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress) ? 18 : 20,
                       decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(width: 0.5))),
                       child: pw.Padding(padding: const pw.EdgeInsets.only(left: 10), child: pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [bold('', 10)])),
                     ),
                     pw.Container(
-                      height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
+                      height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress) ? 18 : 20,
                       decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(width: 0.5))),
                       child: pw.Padding(
                         padding: const pw.EdgeInsets.only(left: 10),
@@ -1120,7 +1102,7 @@ class InvoiceTemplate {
                       ),
                     ),
                     pw.Container(
-                      height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
+                      height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress) ? 18 : 20,
                       color: baseColor,
                       child: pw.Row(
                         crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -1140,14 +1122,14 @@ class InvoiceTemplate {
                       ),
                     ),
                     pw.Container(
-                      height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
+                      height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress) ? 18 : 20,
                       decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(width: 0.5))),
                       child: pw.Padding(
                         padding: const pw.EdgeInsets.only(left: 10),
                         child: pw.Row(
                           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                           children: [
-                            isGST_Local(instInvoice.customerAccountDetails.customerGSTIN)
+                            isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress)
                                 ? bold('CGST - ${(instInvoice.gstPercent / 2).round().toString()} %', 10)
                                 : bold('IGST - ${(instInvoice.gstPercent).round().toString()} %', 10),
                             // regular(formatzero(instInvoice.finalCalc.subtotal), 10),
@@ -1155,9 +1137,9 @@ class InvoiceTemplate {
                         ),
                       ),
                     ),
-                    if (isGST_Local(instInvoice.customerAccountDetails.customerGSTIN))
+                    if (isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress))
                       pw.Container(
-                        height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
+                        height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress) ? 18 : 20,
                         decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(width: 0.5))),
                         child: pw.Padding(
                           padding: const pw.EdgeInsets.only(left: 10),
@@ -1165,12 +1147,12 @@ class InvoiceTemplate {
                         ),
                       ),
                     pw.Container(
-                      height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
+                      height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress) ? 18 : 20,
                       decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(width: 0.5))),
                       child: pw.Padding(padding: const pw.EdgeInsets.only(left: 10), child: pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [bold('Round off ', 10)])),
                     ),
                     pw.Container(
-                      height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
+                      height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress) ? 18 : 20,
                       // decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide())),
                       child: pw.Padding(
                         padding: const pw.EdgeInsets.only(left: 10),
@@ -1194,7 +1176,7 @@ class InvoiceTemplate {
                     mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
                     children: [
                       pw.Container(
-                        height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
+                        height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress) ? 18 : 20,
                         color: baseColor,
                         child: pw.Row(
                           crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -1214,7 +1196,7 @@ class InvoiceTemplate {
                         ),
                       ),
                       pw.Container(
-                        height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
+                        height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress) ? 18 : 20,
                         decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(width: 0.5))),
                         child: pw.Padding(
                           padding: const pw.EdgeInsets.only(right: 5),
@@ -1229,17 +1211,17 @@ class InvoiceTemplate {
                         ),
                       ),
                       pw.Container(
-                        height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
+                        height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress) ? 18 : 20,
                         decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(width: 0.5))),
                         child: pw.Padding(padding: const pw.EdgeInsets.only(left: 10), child: pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [bold('', 10)])),
                       ),
                       pw.Container(
-                        height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
+                        height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress) ? 18 : 20,
                         decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(width: 0.5))),
                         child: pw.Padding(padding: const pw.EdgeInsets.only(left: 10), child: pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [bold('', 10)])),
                       ),
                       pw.Container(
-                        height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
+                        height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress) ? 18 : 20,
                         decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(width: 0.5))),
                         child: pw.Padding(
                           padding: const pw.EdgeInsets.only(right: 5),
@@ -1255,7 +1237,7 @@ class InvoiceTemplate {
                         ),
                       ),
                       pw.Container(
-                        height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
+                        height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress) ? 18 : 20,
                         color: baseColor,
                         child: pw.Row(
                           crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -1275,7 +1257,7 @@ class InvoiceTemplate {
                         ),
                       ),
                       pw.Container(
-                        height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
+                        height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress) ? 18 : 20,
                         decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(width: 0.5))),
                         child: pw.Padding(
                           padding: const pw.EdgeInsets.only(right: 5),
@@ -1283,15 +1265,17 @@ class InvoiceTemplate {
                             // mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                             children: [
                               pw.Spacer(),
-                              isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? bold(formatzero(instInvoice.finalCalc.cgst), 10) : bold(formatzero(instInvoice.finalCalc.igst), 10),
+                              isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress)
+                                  ? bold(formatzero(instInvoice.finalCalc.cgst), 10)
+                                  : bold(formatzero(instInvoice.finalCalc.igst), 10),
                               // regular(formatzero(instInvoice.finalCalc.subtotal), 10),
                             ],
                           ),
                         ),
                       ),
-                      if (isGST_Local(instInvoice.customerAccountDetails.customerGSTIN))
+                      if (isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress))
                         pw.Container(
-                          height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
+                          height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress) ? 18 : 20,
                           decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(width: 0.5))),
                           child: pw.Padding(
                             padding: const pw.EdgeInsets.only(right: 5),
@@ -1302,7 +1286,7 @@ class InvoiceTemplate {
                           ),
                         ),
                       pw.Container(
-                        height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
+                        height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress) ? 18 : 20,
                         decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(width: 0.5))),
                         child: pw.Padding(
                           padding: const pw.EdgeInsets.only(right: 5),
@@ -1313,13 +1297,13 @@ class InvoiceTemplate {
                         ),
                       ),
                       pw.Container(
-                        height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN) ? 18 : 20,
+                        height: isGST_Local(instInvoice.customerAccountDetails.customerGSTIN, instInvoice.addressDetails.billingAddress) ? 18 : 20,
                         // decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide())),
                         child: pw.Padding(
                           padding: const pw.EdgeInsets.only(right: 5),
                           child: pw.Row(
                             // mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                            children: [pw.Spacer(), bold(formatzero(instInvoice.finalCalc.total), 10)],
+                            children: [pw.Spacer(), bold(formatCurrencyRoundedPaisa(instInvoice.finalCalc.total), 10)],
                           ),
                         ),
                       ),
