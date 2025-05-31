@@ -6,7 +6,7 @@ import 'package:recurring_invoice/utils/helpers/support_functions.dart';
 
 class Site {
   static int _counter = 1; // Static counter to auto-increment serial numbers
-  final String serialNo;
+  String serialNo;
   final String siteName;
   final String address;
   final int siteID;
@@ -40,23 +40,6 @@ class Site {
   Map<String, dynamic> toJson() {
     return {'serialNo': serialNo, 'siteName': siteName, 'address': address, 'siteID': siteID, 'branchcode': branchCode, 'monthlyCharges': monthlyCharges};
   }
-
-  // dynamic getIndex(int col) {
-  //   switch (col) {
-  //     case 0:
-  //       return serialNo.toString().trim();
-  //     case 1:
-  //       return siteID.toString().trim();
-  //     case 2:
-  //       return siteName.trim();
-  //     case 3:
-  //       return address.trim();
-  //     case 4:
-  //       return monthlyCharges.toString().trim();
-  //     default:
-  //       return "";
-  //   }
-  // }
 
   dynamic getIndex(int col) {
     switch (col) {
@@ -154,9 +137,9 @@ class BillPlanDetails {
   final int subscriptionBillId;
   final String planType;
   final String billMode;
-  final String amountPaid;
-  final String pendingPayments;
-  final String tdsDeductions;
+  final String? amountPaid;
+  final String? pendingPayments;
+  final String? tdsDeductions;
   final int showPending;
 
   BillPlanDetails({
@@ -554,8 +537,8 @@ class PostData {
       billMode: data.billPlanDetails.billMode.trim(),
       billPeriod: data.billPlanDetails.billPeriod.trim(),
       dueDate: data.billPlanDetails.dueDate.trim(),
-      amountpaid: data.billPlanDetails.amountPaid.trim(),
-      pendingpayments: data.billPlanDetails.pendingPayments.trim(),
+      amountpaid: (data.billPlanDetails.amountPaid ?? '-').trim(),
+      pendingpayments: (data.billPlanDetails.pendingPayments ?? '-').trim(),
       gstNumber: data.customerAccountDetails.customerGSTIN.trim(),
       billdetails: data.billdetails,
     );

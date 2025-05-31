@@ -108,6 +108,7 @@ class InvoiceServices {
       for (int i = 0; i < Invoices.length; i++) {
         PostData salesData = PostData.fromJson(Invoices[i].invoice);
         jsonClub.add(salesData);
+        print(salesData.clientAddressName);
       }
       print("jsonclub : ${jsonClub.length} GeneratedInvoices : ${GeneratedInvoices.length}.................. count : $count");
       if (jsonClub.isNotEmpty && GeneratedInvoices.isNotEmpty && (jsonClub.length == GeneratedInvoices.length)) {

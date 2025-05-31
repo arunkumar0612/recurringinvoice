@@ -73,7 +73,7 @@ class WebsocketServices {
                   InvoicesList.clear();
                 }
               }
-
+              print("****************************COMPLETED*********************");
               // for (int i = 0; i < groupedbyCompanyid.length; i++) {
               //   for (int j = 0; j < groupedbyCompanyid[companyIds[i]]!.length; j++) {
               //     Generators.InvoiceGenerator(groupedbyCompanyid[companyIds[i]]![j]);

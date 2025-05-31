@@ -31,7 +31,8 @@ class InvoiceTemplate {
     final secureshutterimageData = await rootBundle.load('assets/images/secureshutter.jpeg');
     secureshutterImage = pw.MemoryImage(secureshutterimageData.buffer.asUint8List());
     totalDue =
-        ((double.parse(instInvoice.billPlanDetails.pendingPayments) - (double.parse(instInvoice.billPlanDetails.amountPaid) + double.parse(instInvoice.billPlanDetails.tdsDeductions))) +
+        ((double.parse(instInvoice.billPlanDetails.pendingPayments ?? '0') -
+                (double.parse(instInvoice.billPlanDetails.amountPaid ?? '0') + double.parse(instInvoice.billPlanDetails.tdsDeductions ?? '0'))) +
             instInvoice.finalCalc.total);
     // Create PDF document
     final doc = pw.Document();
@@ -259,7 +260,7 @@ class InvoiceTemplate {
                         padding: const pw.EdgeInsets.symmetric(horizontal: 0),
                         child: pw.Text(
                           // 'Annexed',
-                          instInvoice.billPlanDetails.planCharges,
+                          formatCurrency(double.parse(instInvoice.billPlanDetails.planCharges)),
                           textAlign: pw.TextAlign.start,
                           style: pw.TextStyle(font: Helvetica, fontSize: 10, lineSpacing: 2, color: _darkColor),
                           softWrap: true, // Ensure text wraps within the container
@@ -470,7 +471,7 @@ class InvoiceTemplate {
                         padding: const pw.EdgeInsets.symmetric(horizontal: 0),
                         child: pw.Text(
                           // '33AADCK2098J1ZF',
-                          instInvoice.customerAccountDetails.customerGSTIN,
+                          instInvoice.customerAccountDetails.customerGSTIN ?? '-',
                           textAlign: pw.TextAlign.start,
                           style: pw.TextStyle(font: Helvetica_bold, fontSize: 10, lineSpacing: 2, color: _darkColor),
                           softWrap: true, // Ensure text wraps within the container
@@ -653,35 +654,79 @@ class InvoiceTemplate {
 
     List<pw.Widget> rows = [];
 
-    // Add table header
+    // Table header
     rows.add(
       pw.Container(
         decoration: const pw.BoxDecoration(color: baseColor),
         child: pw.Row(
           children: [
-            pw.Expanded(flex: 1, child: headerCell(tableHeaders[0])),
-            pw.Expanded(flex: 5, child: headerCell(tableHeaders[1])),
-            pw.Expanded(flex: 2, child: headerCell(tableHeaders[2])),
-            pw.Expanded(flex: 2, child: headerCell(tableHeaders[3])),
+            pw.Expanded(flex: 1, child: headerCell(tableHeaders[0], 0)),
+            pw.Expanded(flex: 8, child: headerCell(tableHeaders[1], 1)),
+            pw.Expanded(flex: 2, child: headerCell(tableHeaders[2], 2)),
+            pw.Expanded(flex: 2, child: headerCell(tableHeaders[3], 3)),
           ],
         ),
       ),
     );
 
-    // Add each data row
+    // Step 1: Extract and classify rows
+    final List<_SiteRowData> tempRows = [];
+
     for (int row = 0; row < instInvoice.siteData.length; row++) {
+      final rowData = instInvoice.siteData[row];
+      final siteInfo = rowData.getIndex(1).toString(); // siteName||address
+      final siteName = siteInfo.split('||').first.toLowerCase();
+
+      String category;
+      if (siteName.contains('sales')) {
+        category = 'sales';
+      } else if (siteName.contains('service')) {
+        category = 'service';
+      } else {
+        category = 'other';
+      }
+
+      tempRows.add(_SiteRowData(rowData, category));
+    }
+
+    // Step 2: Sort rows by category first, then by siteName
+    tempRows.sort((a, b) {
+      const order = {'sales': 0, 'service': 1, 'other': 2};
+      final catCompare = order[a.category]!.compareTo(order[b.category]!);
+      if (catCompare != 0) return catCompare;
+
+      final nameA = a.data.getIndex(1).toString().split('||').first.toLowerCase();
+      final nameB = b.data.getIndex(1).toString().split('||').first.toLowerCase();
+      return nameA.compareTo(nameB);
+    });
+
+    // Step 3: Reassign serial numbers
+    for (int i = 0; i < tempRows.length; i++) {
+      tempRows[i].data.serialNo = (i + 1).toString();
+    }
+
+    // Step 4: Build rows
+    for (final rowWrapper in tempRows) {
+      final rowData = rowWrapper.data;
+
       rows.add(
         pw.Container(
           decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(color: PdfColors.black, width: 0.5))),
           child: pw.Row(
             children: List.generate(tableHeaders.length, (col) {
-              final content = instInvoice.siteData[row].getIndex(col);
+              final content = rowData.getIndex(col);
               return pw.Expanded(
                 flex: _getFlex(col),
                 child: pw.Container(
                   padding: const pw.EdgeInsets.all(5),
                   alignment: _getAlignment(col),
-                  child: col == 1 && content is String && content.contains('||') ? _buildRichSiteText(content) : pw.Text(content.toString(), style: pw.TextStyle(font: Helvetica, fontSize: 10)),
+                  child:
+                      col == 1 && content is String && content.contains('||')
+                          ? _buildRichSiteText(content)
+                          : pw.Container(
+                            alignment: col == 3 ? pw.Alignment.centerRight : pw.Alignment.centerLeft,
+                            child: pw.Text(col == 3 ? content : content.toString(), style: pw.TextStyle(font: Helvetica, fontSize: 10), textAlign: col == 3 ? pw.TextAlign.right : pw.TextAlign.left),
+                          ),
                 ),
               );
             }),
@@ -690,35 +735,24 @@ class InvoiceTemplate {
       );
     }
 
-    // Add final total row
+    // Final TOTAL row
     rows.add(
       pw.Row(
         children: [
-          pw.Expanded(flex: 6, child: pw.Container()), // Spacer
+          pw.Expanded(flex: 9, child: pw.Container()), // Empty cells for S.No, Name, ID
           pw.Expanded(
             flex: 2,
             child: pw.Container(
               padding: const pw.EdgeInsets.only(left: 5, right: 5, top: 10),
-              // decoration: const pw.BoxDecoration(
-              //   border: pw.Border(
-              //     left: pw.BorderSide(color: PdfColors.black, width: 1),
-              //     right: pw.BorderSide(color: PdfColors.black, width: 1),
-              //     bottom: pw.BorderSide(color: PdfColors.black, width: 1),
-              //   ),
-              // ),
-              alignment: _getAlignment(2),
+              alignment: pw.Alignment.centerLeft,
               child: pw.Text('TOTAL', style: pw.TextStyle(font: Helvetica_bold, fontSize: 12)),
             ),
           ),
           pw.Expanded(
             flex: 2,
             child: pw.Container(
-              padding: const pw.EdgeInsets.only(
-                left: 5,
-                right: 5,
-                top: 10,
-              ), // decoration: const pw.BoxDecoration(border: pw.Border(right: pw.BorderSide(color: PdfColors.black, width: 1), bottom: pw.BorderSide(color: PdfColors.black, width: 1))),
-              alignment: _getAlignment(3),
+              padding: const pw.EdgeInsets.only(left: 5, right: 5, top: 10),
+              alignment: pw.Alignment.centerRight,
               child: pw.Text(formatzero(instInvoice.finalCalc.subtotal), style: pw.TextStyle(font: Helvetica_bold, fontSize: 12)),
             ),
           ),
@@ -729,8 +763,12 @@ class InvoiceTemplate {
     return rows;
   }
 
-  pw.Widget headerCell(String text) {
-    return pw.Container(padding: const pw.EdgeInsets.all(5), alignment: pw.Alignment.centerLeft, child: pw.Text(text, style: pw.TextStyle(font: Helvetica_bold, color: PdfColors.white, fontSize: 10)));
+  pw.Widget headerCell(String text, int index) {
+    return pw.Container(
+      padding: const pw.EdgeInsets.all(5),
+      alignment: index == 3 ? pw.Alignment.centerRight : pw.Alignment.centerLeft,
+      child: pw.Text(text, style: pw.TextStyle(font: Helvetica_bold, color: PdfColors.white, fontSize: 10), textAlign: index == 3 ? pw.TextAlign.right : pw.TextAlign.left),
+    );
   }
 
   int _getFlex(int col) {
@@ -738,8 +776,9 @@ class InvoiceTemplate {
       case 0:
         return 1;
       case 1:
-        return 5;
+        return 8;
       case 2:
+        return 2;
       case 3:
         return 2;
       default:
@@ -776,7 +815,9 @@ class InvoiceTemplate {
                         child: pw.SizedBox(
                           height: 25,
                           child: pw.Text(
-                            instInvoice.billPlanDetails.pendingPayments,
+                            instInvoice.billPlanDetails.pendingPayments == null || instInvoice.billPlanDetails.pendingPayments!.trim() == "null"
+                                ? '-'
+                                : formatCurrency(double.parse(instInvoice.billPlanDetails.pendingPayments!)),
                             style: pw.TextStyle(
                               fontSize: 10,
                               font: Helvetica,
@@ -818,7 +859,9 @@ class InvoiceTemplate {
                       child: pw.Padding(
                         padding: const pw.EdgeInsets.all(8.0),
                         child: pw.Text(
-                          instInvoice.billPlanDetails.amountPaid,
+                          instInvoice.billPlanDetails.amountPaid == null || instInvoice.billPlanDetails.amountPaid!.trim() == 'null'
+                              ? '-'
+                              : formatCurrency(double.parse(instInvoice.billPlanDetails.amountPaid!)),
                           style: pw.TextStyle(
                             font: Helvetica,
                             fontSize: 10,
@@ -861,7 +904,9 @@ class InvoiceTemplate {
                       child: pw.Padding(
                         padding: const pw.EdgeInsets.all(8.0),
                         child: pw.Text(
-                          instInvoice.billPlanDetails.tdsDeductions,
+                          instInvoice.billPlanDetails.tdsDeductions == null || instInvoice.billPlanDetails.tdsDeductions!.trim() == 'null'
+                              ? '-'
+                              : formatCurrency(double.parse(instInvoice.billPlanDetails.tdsDeductions!)),
                           style: pw.TextStyle(
                             font: Helvetica,
                             fontSize: 10,
@@ -1404,4 +1449,11 @@ class InvoiceTemplate {
       ),
     );
   }
+}
+
+class _SiteRowData {
+  final Site data; // replace with your actual SiteData class type if known
+  final String category;
+
+  _SiteRowData(this.data, this.category);
 }
