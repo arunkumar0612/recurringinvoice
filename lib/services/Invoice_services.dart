@@ -108,7 +108,7 @@ class InvoiceServices {
       for (int i = 0; i < Invoices.length; i++) {
         PostData salesData = PostData.fromJson(Invoices[i].invoice);
         jsonClub.add(salesData);
-        print(salesData.clientAddressName);
+        // print(salesData.clientAddressName);
       }
       print("jsonclub : ${jsonClub.length} GeneratedInvoices : ${GeneratedInvoices.length}.................. count : $count");
       if (jsonClub.isNotEmpty && GeneratedInvoices.isNotEmpty && (jsonClub.length == GeneratedInvoices.length)) {
@@ -124,7 +124,7 @@ class InvoiceServices {
 
   static dynamic send_data(String jsonData, List<File> GeneratedInvoices) async {
     try {
-      Map<String, dynamic>? response = await apiController.Multer(jsonData, GeneratedInvoices, "http://192.168.0.200:8081/subscription/addrecurringinvoice");
+      Map<String, dynamic>? response = await apiController.Multer(jsonData, GeneratedInvoices, "http://192.168.0.12:8081/subscription/addrecurringinvoice");
       if (response['statusCode'] == 200) {
         print(response['data']);
         // CMDmResponse value = CMDmResponse.fromJson(response);

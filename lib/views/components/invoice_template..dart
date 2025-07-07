@@ -31,9 +31,22 @@ class InvoiceTemplate {
     final secureshutterimageData = await rootBundle.load('assets/images/secureshutter.jpeg');
     secureshutterImage = pw.MemoryImage(secureshutterimageData.buffer.asUint8List());
     totalDue =
-        ((double.parse(instInvoice.billPlanDetails.pendingPayments ?? '0') -
-                (double.parse(instInvoice.billPlanDetails.amountPaid ?? '0') + double.parse(instInvoice.billPlanDetails.tdsDeductions ?? '0'))) +
+        ((instInvoice.billPlanDetails.pendingPayments == null || instInvoice.billPlanDetails.pendingPayments!.trim() == 'null'
+                ? 0
+                : double.parse(instInvoice.billPlanDetails.pendingPayments!) -
+                    (instInvoice.billPlanDetails.amountPaid == null || instInvoice.billPlanDetails.amountPaid!.trim() == 'null'
+                        ? 0
+                        : double.parse(instInvoice.billPlanDetails.amountPaid!) +
+                            (instInvoice.billPlanDetails.tdsDeductions == null || instInvoice.billPlanDetails.tdsDeductions!.trim() == 'null'
+                                ? 0
+                                : double.parse(instInvoice.billPlanDetails.tdsDeductions!)))) +
             instInvoice.finalCalc.total);
+    // print("Pending: ${instInvoice.billPlanDetails.pendingPayments}");
+    // print("Paid: ${instInvoice.billPlanDetails.amountPaid}");
+    // print("TDS: ${instInvoice.billPlanDetails.tdsDeductions}");
+    // print("Final Total: ${instInvoice.finalCalc.total}");
+    // print("Total Due: $totalDue");
+
     // Create PDF document
     final doc = pw.Document();
 
@@ -286,7 +299,7 @@ class InvoiceTemplate {
                         padding: const pw.EdgeInsets.symmetric(horizontal: 0),
                         child: pw.Text(
                           // '0.00°',
-                          instInvoice.billPlanDetails.internetCharges.toString(),
+                          formatCurrency(instInvoice.billPlanDetails.internetCharges),
                           textAlign: pw.TextAlign.start,
                           style: pw.TextStyle(font: Helvetica, fontSize: 10, lineSpacing: 2, color: _darkColor),
                           softWrap: true, // Ensure text wraps within the container
